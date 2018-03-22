@@ -1,0 +1,41 @@
+\ProvidesPackage{nimopaper}
+
+\usepackage{multicol}
+\usepackage{upquote} % for backticks
+\usepackage{stmaryrd} % for \mapsfrom
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage{subfigure}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage[english]{babel}
+\usepackage[section]{placeins}
+\usepackage[svgnames]{xcolor}
+\usepackage[colorlinks]{hyperref}
+\hypersetup{citecolor=DarkRed}
+\hypersetup{linkcolor=DarkRed}
+\hypersetup{urlcolor=DarkRed}
+\usepackage{cleveref}
+
+% Code listing settings
+\lstset{basicstyle=\small\ttfamily}
+
+\newcommand{\cL}{{\cal L}}
+\newcommand{\Penrose}{\textsc{Penrose}}
+\newcommand{\Style}{\textsc{Style}}
+\newcommand{\Substance}{\textsc{Substance}}
+\newcommand{\View}{\textsc{View}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\niw}[1]{\color{blue}{{\bf NIW: #1}}\color{black}}
+\newcommand{\todo}[1]{\color{red}{{\bf TODO: #1}}\color{black}}
+\newcommand{\note}[1]{\color{blue}{{\bf NOTE: #1}}\color{black}}
+\newcommand{\freefootnote}[1]{\let\thefootnote\relax\footnotetext{#1}}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
