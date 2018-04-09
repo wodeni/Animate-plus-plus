@@ -19,7 +19,7 @@ An mock program of our system after the completion of the first milestone:
 
 __Input SVG file__:
 ```xml
-<svg width="200" height="250" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<svg width="400" height="400" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <rect x="50" y="50" width="30" height="30" stroke="black" fill="red" stroke-width="1"/>
 </svg>
 ```
@@ -50,7 +50,7 @@ int main() {
 
 __Exported SVG__: this is one of the frames. The resulting SVG will be the same square rotating with respect to its center indefinitely
 ```xml
-<svg width="400" height="450" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<svg width="400" height="400" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <rect x="50" y="50" width="30" height="30" stroke="black" fill="red" stroke-width="1">
       <animateTransform attributeName="transform"
           attributeType="XML"

@@ -4,6 +4,7 @@ BUILD_DIR ?= ./build
 SRC_DIRS ?= ./src
 # ./include
 
+
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
@@ -12,6 +13,8 @@ INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
+
+COMMON_DOC_FLAGS = --report --merge docs --output html $(SRCS)
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
@@ -33,6 +36,18 @@ $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(MKDIR_P) $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+# FIXME: this does NOT work because if clang version and python binding issues :(
+# doc:
+# 	@echo "Generating documentation..."; \
+# 	cldoc generate $(CPPFLAGS) -- $(COMMON_DOC_FLAGS)
+#
+# static-doc:
+# 	@echo "Generating static documentation..."; \
+# 	cldoc generate $(CPPFLAGS) -- --static $(COMMON_DOC_FLAGS)
+#
+# serve:
+# 	cldoc serve html
 
 
 .PHONY: clean
