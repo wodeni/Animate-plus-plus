@@ -5,12 +5,17 @@
  */
 
 #include <iostream>
+#include <map>
+#include <string>
 #include <vector>
 using namespace std;
 
 namespace anipp {
 
     void test() { std::cout << "Hello World" << '\n'; }
+
+    typedef map<string, string> Properties;
+
 
     struct Point {
         double x;
@@ -30,9 +35,23 @@ namespace anipp {
      */
     class Shape {
     private:
-        Animator animate; // The animator of a graphical primitive
+        Animator animate;      // The animator of a graphical primitive
+        Properties properties; // CSS styling properties of the object
     public:
         virtual ostream& operator<< (ostream& out) const;
+    };
+
+    /*
+     * a group of multiple primitives
+     */
+    class Group : public Shape {
+    private:
+        vector<Shape> shapes;
+    public:
+        Group();
+        Group(vector<Shape>&);
+        ~Group();
+        ostream& operator<< (ostream& out) const;
     };
 
     /*
@@ -100,6 +119,7 @@ namespace anipp {
         vector<Point> points; // A list of points
     public:
         Polyline(vector<Point> &);
+        ~Polyline();
         ostream& operator<< (ostream& out) const;
     };
 
@@ -111,21 +131,32 @@ namespace anipp {
         vector<Point> points; // A list of points
     public:
         Polygon(vector<Point> &);
+        ~Polygon();
         ostream& operator<< (ostream& out) const;
     };
 
     /*
      * Abstract representation of <d> in <path>, which is a path descriptor
      * Five line command:
-     *   - moveto
-     *   - lineto
-     *   - curveto
-     *   - arcto
-     *   - closepath
+     *   - moveto (M, m)
+     *   - lineto (L, l, H, h, V, v)
+     *   - curveto (C, Q, T, S)
+     *   - arcto (TODO)
+     *   - closepath (Z)
      */
 
     class PathDescription {
         // TODO
+    private:
+        // key: command symbol
+        // value: list of numbers with variable length
+        map<string, vector<double>> commands;
+    public:
+        PathDescription(string path_string);
+        ~PathDescription();
+        void to_path_string(); // TODO: operator>>?
+        // TODO: add handles for modifying a path description
+        void move_to(double, double);
     };
 
 
@@ -139,5 +170,26 @@ namespace anipp {
         Path(vector<Point> &);
         ostream& operator<< (ostream& out) const;
     };
+
+    /*
+     * Scene class
+     */
+    class Scene {
+    private:
+        vector<Shape> shapes; // all objects in the scene
+    };
+
+    // This function loads from an SVG file to a Group object
+    Shape load_SVG(string filename) {
+        // 1. Load XML file
+        // 2. Walk through the tree structure and construct objects
+        // for(Node n : tree)
+        //     Shape()
+        // 3. return shapes
+    }
+
+    // This function writes an SVG file to the disk given a Shape object
+    // NOTE: shape could be a collection of shapes
+    void save_SVG(Shape shp, string filename);
 
 }

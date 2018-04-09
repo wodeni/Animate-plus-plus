@@ -30,7 +30,7 @@ __Target program__: outputs a synoptically correct SVG file that yields to the s
 using namespace anipp;
 
 int main() {
-    Shape rect = svg.load("./sample.svg"); // load the xml file containing svg
+    Shape rect = load_SVG("./sample.svg"); // load the xml file containing svg
     cout << rect.x << "\n"; // read its x
     cout << rect.width << "\n"; // read its width
 
@@ -39,7 +39,7 @@ int main() {
     // (exact arguments TBD)
     rect.animator.rotate_center();
 
-    rect.export("./output.svg"); // save to output.xml file
+    save_SVG(rect, "./output.svg"); // save to output.xml file
 }
 ```
 
