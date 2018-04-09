@@ -20,7 +20,7 @@ __Input SVG file__:
 ```
 
 <p align="center">
-    <img src="assets/progress-report-02b00.png" width=25%/>
+    <img src="./docs/assets/progress-report-02b00.png" width=25%/>
 </p>
 
 __Target program__: outputs a synoptically correct SVG file that yields to the same visual output
@@ -59,5 +59,5 @@ __Exported SVG__: this is one of the frames. The resulting SVG will be the same 
 ```
 
 <p align="center">
-    <img src="assets/progress-report-b6d91.png" width=25%/>
+    <img src="docs/assets/progress-report-b6d91.png" width=25%/>
 </p>
