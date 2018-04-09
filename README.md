@@ -4,11 +4,12 @@ Animate++ is a C++ library that lets you rapidly compose beautiful vector graphi
 
 ## Getting started
 
-TBD
+- To build the project
+
 
 ## Dependencies
 
-- rapidxml
+- pugixml: `1.9`
 
 ## Examples
 
@@ -20,7 +21,7 @@ __Input SVG file__:
 ```
 
 <p align="center">
-    <img src="assets/progress-report-02b00.png" width=25%/>
+    <img src="docs/assets/progress-report-02b00.png" width=25%/>
 </p>
 
 __Target program__: outputs a synoptically correct SVG file that yields to the same visual output
@@ -30,7 +31,7 @@ __Target program__: outputs a synoptically correct SVG file that yields to the s
 using namespace anipp;
 
 int main() {
-    Shape rect = load_SVG("./sample.svg"); // load the xml file containing svg
+    Shape rect = svg.load("./sample.svg"); // load the xml file containing svg
     cout << rect.x << "\n"; // read its x
     cout << rect.width << "\n"; // read its width
 
@@ -39,7 +40,7 @@ int main() {
     // (exact arguments TBD)
     rect.animator.rotate_center();
 
-    save_SVG(rect, "./output.svg"); // save to output.xml file
+    rect.export("./output.svg"); // save to output.xml file
 }
 ```
 
@@ -59,5 +60,5 @@ __Exported SVG__: this is one of the frames. The resulting SVG will be the same 
 ```
 
 <p align="center">
-    <img src="assets/progress-report-b6d91.png" width=25%/>
+    <img src="docs/progress-report/sample.svg" width=100%/>
 </p>
