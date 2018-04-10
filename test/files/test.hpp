@@ -21,6 +21,12 @@ Rect test_square(string);
 // load a sphere. test on "sample.svg".
 Circle test_circle(string);
 
+// load a rectangle. test on "sample.svg".
+Ellipse test_ellipse(string);
+
+// load a sphere. test on "sample.svg".
+Line test_line(string);
+
 // generic test
 template <typename T>
 void test_shape(T (*test_func)(string), string, string);

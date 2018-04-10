@@ -108,6 +108,42 @@ ostream& Ellipse::print(ostream& out) const {
     return out;
 }
 
+/*
+ * Line
+ */
+Line::Line(double x1, double y1, double x2, double y2)
+        : x1{x1}
+        , y1{y1}
+        , x2{x2}
+        , y2{y2}
+{ }
+
+xml_document Line::export_SVG() const {
+    xml_document doc;
+    auto svg  = doc.append_child("svg");
+    svg.append_attribute("version").set_value("1.1");
+    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
+    auto line = svg.append_child("line");
+    auto x1 = line.append_attribute("x1");
+    auto y1 = line.append_attribute("y1");
+    auto x2 = line.append_attribute("x2");
+    auto y2 = line.append_attribute("y2");
+    x1.set_value(this->x1);
+    y1.set_value(this->y1);
+    x2.set_value(this->x2);
+    y2.set_value(this->y2);
+    return doc;
+}
+
+ostream& Line::print(ostream& out) const {
+    out << "Line: " <<
+        "x1 = " << this->x1 <<
+        ", y1 = " << this->y1 <<
+        ", x2 = " << this->x2 <<
+        ", y2 = " << this->y2 << '\n';
+    return out;
+}
+
 ostream& operator<< (ostream& out, const anipp::Shape& shp) {
     shp.print(out);
     return out;

@@ -77,6 +77,24 @@ Ellipse test_ellipse(string filename) {
     }
 }
 
+Line test_line(string filename) {
+    // load
+    xml_document doc;
+    xml_parse_result result = doc.load_file(filename.c_str());
+    if(!result)
+        throw "Failed to load SVG file!";
+    else {
+        xml_node svg  = doc.child("svg");
+        xml_node line_node = svg.child("line");
+        double x1 = stod(line_node.attribute("x1").value());
+        double y1 = stod(line_node.attribute("y1").value());
+        double x2 = stod(line_node.attribute("x2").value());
+        double y2 = stod(line_node.attribute("y2").value());
+        Line line(x1, y1, x2, y2);
+        return line;
+    }
+}
+
 template<typename T>
 void test_shape(T (*test_func)(string), string in_path, string out_path) {
     T obj = test_func(in_path);
@@ -90,6 +108,6 @@ int main() {
     test_shape<Rect>(test_square, in_path, "test/svgs/Rect.svg");
     test_shape<Circle>(test_circle, in_path, "test/svgs/Circle.svg");
     test_shape<Ellipse>(test_ellipse, in_path, "test/svgs/Ellipse.svg");
-
+    test_shape<Line>(test_line, in_path, "test/svgs/Line.svg");
     return 0;
 }

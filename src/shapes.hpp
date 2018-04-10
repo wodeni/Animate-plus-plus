@@ -112,6 +112,7 @@ namespace anipp {
         double y2; // The y position of point 2.
     public:
         Line(double, double, double, double);
+        xml_document export_SVG() const;
         ostream& print(ostream& out) const;
     };
 
