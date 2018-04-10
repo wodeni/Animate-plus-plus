@@ -1,7 +1,7 @@
 TARGET_EXEC ?= a.out
 
 BUILD_DIR ?= ./build
-SRC_DIRS ?= ./src ./include/pugixml-1.9/src
+SRC_DIRS ?= ./src ./include/pugixml-1.9/src ./test
 # ./include
 
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)

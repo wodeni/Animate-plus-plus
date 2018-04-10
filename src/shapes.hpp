@@ -3,6 +3,7 @@
 
 #include "animate.hpp"
 using namespace std;
+using namespace pugi;
 
 namespace anipp {
     ///////////////////////////////////////////////////////////////////////////
@@ -58,11 +59,12 @@ namespace anipp {
      */
     class Circle : public Shape {
     private:
-        double x;
-        double y;
+        double cx;
+        double cy;
         double r; // the radius of the circle
     public:
         Circle(double, double, double);
+        xml_document export_SVG() const;
         ostream& print(ostream& out) const;
     };
 
@@ -80,7 +82,7 @@ namespace anipp {
     public:
         Rect(double, double, double, double, double rx=0, double ry=0);
         ~Rect() {}
-        pugi::xml_document export_SVG() const;
+        xml_document export_SVG() const;
         ostream& print(ostream& out) const;
     };
 
@@ -95,6 +97,7 @@ namespace anipp {
         double cy; // The y position of the center of the ellipse.
     public:
         Ellipse(double, double, double, double);
+        xml_document export_SVG() const;
         ostream& print(ostream& out) const;
     };
 
