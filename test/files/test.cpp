@@ -24,6 +24,7 @@ void print_SVG(string filename) {
     }
 }
 
+
 Rect test_square(string filename) {
     // load
     xml_document doc;
@@ -95,10 +96,38 @@ Line test_line(string filename) {
     }
 }
 
+Polyline test_polyline(string filename) {
+    xml_document doc;
+    xml_parse_result result = doc.load_file(filename.c_str());
+    if(!result)
+        throw "Failed to load SVG file!";
+    else {
+        xml_node svg  = doc.child("svg");
+        xml_node polyline_node = svg.child("polyline");
+        vector<Point> points = load_points(polyline_node.attribute("points").value());
+        Polyline polyline(points);
+        return polyline;
+    }
+}
+
+Polygon test_polygon(string filename) {
+    xml_document doc;
+    xml_parse_result result = doc.load_file(filename.c_str());
+    if(!result)
+        throw "Failed to load SVG file!";
+    else {
+        xml_node svg  = doc.child("svg");
+        xml_node polygon_node= svg.child("polygon");
+        vector<Point> points = load_points(polygon_node.attribute("points").value());
+        Polygon polygon(points);
+        return polygon;
+    }
+}
+
 template<typename T>
 void test_shape(T (*test_func)(string), string in_path, string out_path) {
     T obj = test_func(in_path);
-    cout << obj << endl;
+    cout << obj << "\n";
     xml_document doc = obj.export_SVG();
     doc.save_file(out_path.c_str());
 }
@@ -109,5 +138,7 @@ int main() {
     test_shape<Circle>(test_circle, in_path, "test/svgs/Circle.svg");
     test_shape<Ellipse>(test_ellipse, in_path, "test/svgs/Ellipse.svg");
     test_shape<Line>(test_line, in_path, "test/svgs/Line.svg");
+    test_shape<Polyline>(test_polyline, in_path, "test/svgs/Polyline.svg");
+    test_shape<Polygon>(test_polygon, in_path, "test/svgs/Polygon.svg");
     return 0;
 }

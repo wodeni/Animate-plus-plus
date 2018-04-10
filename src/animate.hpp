@@ -8,6 +8,8 @@
 #define __ANIMATE_HPP__
 
 #include <iostream>
+#include <sstream>
+#include <cassert>
 #include <map>
 #include <string>
 #include <vector>

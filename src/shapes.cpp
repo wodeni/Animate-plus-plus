@@ -1,6 +1,69 @@
 #include "shapes.hpp"
 
 using namespace anipp;
+using namespace std;
+
+/*
+ * Point
+ */
+Point::Point(double x, double y)
+        : x{x}
+        , y{y}
+{ }
+
+// This print x and y value together with a space between them.
+// Used for "toString" method.
+string Point::display() const {
+    return to_string(this->x) + " " + to_string(this->y);
+}
+
+//TODO: is there anyway we can skip virtual function?
+xml_document Point::export_SVG() const {
+    xml_document doc;
+    return doc;
+}
+
+ostream& Point::print(ostream& out) const {
+    out << "Point: " <<
+        "x = " << this->x <<
+        " y = " << this->y << "\n";
+    return out;
+}
+
+// This function can be used in constructing polyline and polygon
+// Taking the string as input and return a vector of points.
+// ex:
+// load_points("100 50 40 30") -> {Point(100, 50), Point(40, 30)}
+vector<Point> anipp::load_points(string str) {
+    string buf;
+    stringstream ss(str);
+    vector<string> vec;
+    while(ss >> buf) {
+        vec.push_back(buf);
+    }
+    assert(vec.size()%2 == 0);
+    vector<Point> vec_res;
+    auto it = vec.begin();
+    while(it != vec.end()) {
+        Point p(stod(*it), stod(*(it+1)));
+        vec_res.push_back(p);
+        it += 2;
+    }
+    return vec_res;
+}
+
+// This function can be used in export polyline and polygon
+// Taking a vector of points as input and return a string containing
+// all points in the vector.
+// ex:
+// toString({Point(100, 50), Point(40, 30)}) -> "100 50 40 30"
+string anipp::toString(vector<Point> points) {
+    string res;
+    auto it=points.begin();
+    for(; it!=points.end()-1; ++it)
+        res = res + (*it).display() + " ";
+    return res + (*it).display();
+}
 
 /*
  * Rectangle
@@ -141,6 +204,57 @@ ostream& Line::print(ostream& out) const {
         ", y1 = " << this->y1 <<
         ", x2 = " << this->x2 <<
         ", y2 = " << this->y2 << '\n';
+    return out;
+}
+
+
+/*
+ * Polyline
+ */
+Polyline::Polyline(vector<Point> & points)
+        : points(points)
+{ }
+
+xml_document Polyline::export_SVG() const {
+    xml_document doc;
+    auto svg  = doc.append_child("svg");
+    svg.append_attribute("version").set_value("1.1");
+    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
+    auto polyline = svg.append_child("polyline");
+    auto points = polyline.append_attribute("points");
+    points.set_value(toString(this->points).c_str());
+    return doc;
+}
+
+ostream& Polyline::print(ostream& out) const {
+    out << "Polyline: " << "\n";
+    for(auto it=this->points.begin(); it!=this->points.end(); ++it)
+        out << (*it).display() << "\n";
+    return out;
+}
+
+/*
+ * Polygon
+ */
+Polygon::Polygon(vector<Point> & points)
+        : points(points)
+{ }
+
+xml_document Polygon::export_SVG() const {
+    xml_document doc;
+    auto svg  = doc.append_child("svg");
+    svg.append_attribute("version").set_value("1.1");
+    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
+    auto polygon= svg.append_child("polygon");
+    auto points = polygon.append_attribute("points");
+    points.set_value(toString(this->points).c_str());
+    return doc;
+}
+
+ostream& Polygon::print(ostream& out) const {
+    out << "Polygon: " << "\n";
+    for(auto it=this->points.begin(); it!=this->points.end(); ++it)
+        out << (*it).display() << "\n";
     return out;
 }
 

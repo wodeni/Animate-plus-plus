@@ -10,6 +10,7 @@ namespace anipp {
     class Scene;
     class Shape;
     class Group;
+    class Point;
     class Circle;
     class Rect;
     class Ellipse;
@@ -21,10 +22,7 @@ namespace anipp {
     ///////////////////////////////////////////////////////////////////////////
 
     typedef map<string, string> Properties;
-    struct Point {
-        double x;
-        double y;
-    };
+
     class Animator {
         // TODO: to be implemented
     };
@@ -38,7 +36,7 @@ namespace anipp {
         Properties properties; // CSS styling properties of the object
     public:
         virtual ostream& print(ostream& out) const = 0;
-        virtual pugi::xml_document export_SVG() const = 0;
+        virtual xml_document export_SVG() const = 0;
     };
 
     /*
@@ -53,6 +51,23 @@ namespace anipp {
         ~Group();
         ostream& print(ostream& out) const;
     };
+
+    /*
+     * Point class
+     */
+    class Point : public Shape {
+    private:
+        double x;
+        double y;
+    public:
+        Point(double, double);
+        string display() const; // print (x y)
+        xml_document export_SVG() const;
+        ostream& print(ostream& out) const;
+    };
+
+    vector<Point> load_points(string str);
+    string toString(vector<Point> vec);
 
     /*
      * Circle class
@@ -124,7 +139,7 @@ namespace anipp {
         vector<Point> points; // A list of points
     public:
         Polyline(vector<Point> &);
-        ~Polyline();
+        xml_document export_SVG() const;
         ostream& print(ostream& out) const;
     };
 
@@ -136,7 +151,7 @@ namespace anipp {
         vector<Point> points; // A list of points
     public:
         Polygon(vector<Point> &);
-        ~Polygon();
+        xml_document export_SVG() const;
         ostream& print(ostream& out) const;
     };
 
