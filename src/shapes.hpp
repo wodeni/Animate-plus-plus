@@ -37,6 +37,7 @@ namespace anipp {
         Properties properties; // CSS styling properties of the object
     public:
         virtual ostream& print(ostream& out) const = 0;
+        virtual pugi::xml_document export_SVG() const = 0;
     };
 
     /*
@@ -79,6 +80,7 @@ namespace anipp {
     public:
         Rect(double, double, double, double, double rx=0, double ry=0);
         ~Rect() {}
+        pugi::xml_document export_SVG() const;
         ostream& print(ostream& out) const;
     };
 

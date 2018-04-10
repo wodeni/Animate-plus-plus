@@ -11,6 +11,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "pugixml.hpp"
 #include "shapes.hpp"
 
 using namespace std;

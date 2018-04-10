@@ -6,7 +6,6 @@
 
 #include <string>
 #include <sstream>
-#include "pugixml.hpp"
 #include "animate.hpp"
 
 using namespace std;
@@ -52,5 +51,7 @@ int main() {
     print_SVG("test/sample.svg");
     anipp::Rect r = test_square("test/sample.svg");
     cout << r << endl;
+    auto doc = r.export_SVG();
+    doc.save_file("test/output.svg");
     return 0;
 }
