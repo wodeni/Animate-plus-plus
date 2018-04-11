@@ -87,6 +87,17 @@ void anipp::Shape::export_properties(xml_node & node) {
     }
 }
 
+// print all properties
+void anipp::Shape::print_properties(ostream& out) const {
+    for(auto it=this->properties.begin(); it!=this->properties.end(); ++it) {
+        auto key = it->first;
+        auto value = it->second;
+        out << key << " = " << value << ", ";
+    }
+    out << "\n";
+}
+
+
 /*
  * Rectangle
  */
@@ -122,7 +133,9 @@ ostream& Rect::print(ostream& out) const {
         "x = " << this->x <<
         ", y = " << this->y <<
         ", width = " << this->width <<
-        ", height = " << this->height << '\n';
+        ", height = " << this->height <<
+        ", ";
+    anipp::Shape::print_properties(out);
     return out;
 }
 
@@ -155,7 +168,9 @@ ostream& Circle::print(ostream& out) const {
     out << "Circle: " <<
         "cx = " << this->cx <<
         ", cy = " << this->cy <<
-        ", r = " << this->r << '\n';
+        ", r = " << this->r <<
+        ", ";
+    anipp::Shape::print_properties(out);
     return out;
 }
 
@@ -192,7 +207,9 @@ ostream& Ellipse::print(ostream& out) const {
         "cx = " << this->cx <<
         ", cy = " << this->cy <<
         ", rx = " << this->rx <<
-        ", ry = " << this->ry << '\n';
+        ", ry = " << this->ry <<
+        ", ";
+    anipp::Shape::print_properties(out);
     return out;
 }
 
@@ -229,7 +246,9 @@ ostream& Line::print(ostream& out) const {
         "x1 = " << this->x1 <<
         ", y1 = " << this->y1 <<
         ", x2 = " << this->x2 <<
-        ", y2 = " << this->y2 << '\n';
+        ", y2 = " << this->y2 <<
+        ", ";
+    anipp::Shape::print_properties(out);
     return out;
 }
 
@@ -254,9 +273,10 @@ xml_document Polyline::export_SVG() {
 }
 
 ostream& Polyline::print(ostream& out) const {
-    out << "Polyline: " << "\n";
+    out << "Polyline: points = ";
     for(auto it=this->points.begin(); it!=this->points.end(); ++it)
-        out << (*it).display() << "\n";
+        out << (*it).display() << " ";
+    anipp::Shape::print_properties(out);
     return out;
 }
 
@@ -280,9 +300,10 @@ xml_document Polygon::export_SVG() {
 }
 
 ostream& Polygon::print(ostream& out) const {
-    out << "Polygon: " << "\n";
+    out << "Polygon: points = ";
     for(auto it=this->points.begin(); it!=this->points.end(); ++it)
-        out << (*it).display() << "\n";
+        out << (*it).display() << " ";
+    anipp::Shape::print_properties(out);
     return out;
 }
 

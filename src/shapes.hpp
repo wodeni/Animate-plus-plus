@@ -52,7 +52,8 @@ namespace anipp {
     public:
         virtual ostream& print(ostream& out) const = 0;
         virtual xml_document export_SVG() = 0;
-        Properties get_properties() {return this->properties;}
+        virtual Properties get_properties() const {return this->properties;}
+        void print_properties(ostream& out) const;
         void load_properties(xml_node & node, string type) ;
         void export_properties(xml_node & node) ;
     };
