@@ -2,6 +2,7 @@
 #define __SHAPES_HPP__
 
 #include "animate.hpp"
+#include "parser.hpp"
 using namespace std;
 using namespace pugi;
 
@@ -193,7 +194,8 @@ namespace anipp {
     public:
         PathDescription(string path_string);
         ~PathDescription();
-        void to_path_string(); // TODO: operator>>?
+        void as_string(); // TODO: operator>>?
+        PathDescription& operator>> (pair<string, vector<double>>);
         // TODO: add handles for modifying a path description
         void move_to(double, double);
     };

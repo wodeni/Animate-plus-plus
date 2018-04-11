@@ -307,6 +307,32 @@ ostream& Polygon::print(ostream& out) const {
     return out;
 }
 
+/*
+ * Path
+ */
+Path::Path(vector<Point>& points) {
+
+
+}
+
+ostream& Path::print(ostream& out) const {
+
+}
+
+
+/*
+ * Path description
+ * See standard https://www.w3.org/TR/SVG/paths.html
+ */
+ PathDescription::PathDescription(string s) {
+     // remove the spaces first
+     // from:
+ //  https://stackoverflow.com/questions/14233065/remove-whitespace-in-stdstring
+     // s.erase(remove_if(s.begin(), s.end(), ::isspace), s.end());
+     pegtl::file_input<> in(s);
+     cout << s << '\n';
+ }
+
 ostream& operator<< (ostream& out, const anipp::Shape& shp) {
     shp.print(out);
     return out;
