@@ -11,6 +11,7 @@
 #include <sstream>
 #include <cassert>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 #include "pugixml.hpp"

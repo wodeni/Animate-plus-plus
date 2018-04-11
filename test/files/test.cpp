@@ -39,6 +39,7 @@ Rect test_square(string filename) {
         double width = stod(rect.attribute("width").value());
         double height = stod(rect.attribute("height").value());
         Rect rectangle(x, y, width, height);
+        rectangle.load_properties(rect, "rect");
         return rectangle;
     }
 }
@@ -56,6 +57,7 @@ Circle test_circle(string filename) {
         double cy = stod(circle_node.attribute("cy").value());
         double r = stod(circle_node.attribute("r").value());
         Circle circle(cx, cy, r);
+        circle.load_properties(circle_node, "circle");
         return circle;
     }
 }
@@ -74,6 +76,7 @@ Ellipse test_ellipse(string filename) {
         double rx = stod(ellipse_node.attribute("rx").value());
         double ry = stod(ellipse_node.attribute("ry").value());
         Ellipse ellipse(cx, cy, rx, ry);
+        ellipse.load_properties(ellipse_node, "ellipse");
         return ellipse;
     }
 }
@@ -92,6 +95,7 @@ Line test_line(string filename) {
         double x2 = stod(line_node.attribute("x2").value());
         double y2 = stod(line_node.attribute("y2").value());
         Line line(x1, y1, x2, y2);
+        line.load_properties(line_node, "line");
         return line;
     }
 }
@@ -106,6 +110,7 @@ Polyline test_polyline(string filename) {
         xml_node polyline_node = svg.child("polyline");
         vector<Point> points = load_points(polyline_node.attribute("points").value());
         Polyline polyline(points);
+        polyline.load_properties(polyline_node, "polyline");
         return polyline;
     }
 }
@@ -120,6 +125,7 @@ Polygon test_polygon(string filename) {
         xml_node polygon_node= svg.child("polygon");
         vector<Point> points = load_points(polygon_node.attribute("points").value());
         Polygon polygon(points);
+        polygon.load_properties(polygon_node, "polygon");
         return polygon;
     }
 }

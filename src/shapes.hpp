@@ -22,7 +22,22 @@ namespace anipp {
     ///////////////////////////////////////////////////////////////////////////
 
     typedef map<string, string> Properties;
+    typedef map<string, set<string>> Table;
 
+    const Table internal_properties (
+            {
+                    {"circle", {"cx", "cy", "r"}},
+                    {"rect", {"x", "y", "height", "width", "rx", "ry"}},
+                    {"ellipse", {"rx", "ry", "cx", "cy"}},
+                    {"line", {"x1", "y1", "x2", "y2"}},
+                    {"polyline", {"points"}},
+                    {"polygon", {"points"}}
+            }
+            );
+    // A table contains key value pair of
+    // shape and necessary properties
+    // We ignore those properties when we
+    // are parsing external properties.
     class Animator {
         // TODO: to be implemented
     };
@@ -36,7 +51,10 @@ namespace anipp {
         Properties properties; // CSS styling properties of the object
     public:
         virtual ostream& print(ostream& out) const = 0;
-        virtual xml_document export_SVG() const = 0;
+        virtual xml_document export_SVG() = 0;
+        Properties get_properties() {return this->properties;}
+        void load_properties(xml_node & node, string type) ;
+        void export_properties(xml_node & node) ;
     };
 
     /*
@@ -62,7 +80,7 @@ namespace anipp {
     public:
         Point(double, double);
         string display() const; // print (x y)
-        xml_document export_SVG() const;
+        xml_document export_SVG() ;
         ostream& print(ostream& out) const;
     };
 
@@ -79,7 +97,7 @@ namespace anipp {
         double r; // the radius of the circle
     public:
         Circle(double, double, double);
-        xml_document export_SVG() const;
+        xml_document export_SVG() ;
         ostream& print(ostream& out) const;
     };
 
@@ -97,7 +115,7 @@ namespace anipp {
     public:
         Rect(double, double, double, double, double rx=0, double ry=0);
         ~Rect() {}
-        xml_document export_SVG() const;
+        xml_document export_SVG() ;
         ostream& print(ostream& out) const;
     };
 
@@ -112,7 +130,7 @@ namespace anipp {
         double cy; // The y position of the center of the ellipse.
     public:
         Ellipse(double, double, double, double);
-        xml_document export_SVG() const;
+        xml_document export_SVG() ;
         ostream& print(ostream& out) const;
     };
 
@@ -127,7 +145,7 @@ namespace anipp {
         double y2; // The y position of point 2.
     public:
         Line(double, double, double, double);
-        xml_document export_SVG() const;
+        xml_document export_SVG() ;
         ostream& print(ostream& out) const;
     };
 
@@ -139,7 +157,7 @@ namespace anipp {
         vector<Point> points; // A list of points
     public:
         Polyline(vector<Point> &);
-        xml_document export_SVG() const;
+        xml_document export_SVG() ;
         ostream& print(ostream& out) const;
     };
 
@@ -151,7 +169,7 @@ namespace anipp {
         vector<Point> points; // A list of points
     public:
         Polygon(vector<Point> &);
-        xml_document export_SVG() const;
+        xml_document export_SVG() ;
         ostream& print(ostream& out) const;
     };
 

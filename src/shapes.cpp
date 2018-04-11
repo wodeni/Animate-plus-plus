@@ -18,7 +18,7 @@ string Point::display() const {
 }
 
 //TODO: is there anyway we can skip virtual function?
-xml_document Point::export_SVG() const {
+xml_document Point::export_SVG() {
     xml_document doc;
     return doc;
 }
@@ -65,6 +65,28 @@ string anipp::toString(vector<Point> points) {
     return res + (*it).display();
 }
 
+// load properties from string into map
+void anipp::Shape::load_properties(xml_node & node, string type) {
+    auto it = internal_properties.find(type);
+    assert(it != internal_properties.end());
+    set<string> variables = it -> second;
+    for (auto ait = node.attributes_begin(); ait != node.attributes_end(); ++ait) {
+        if(variables.find(ait->name()) == variables.end()) {
+            (this->properties).insert(pair<string, string>(ait->name(), ait->value()));
+        }
+    }
+}
+
+// export properties to the given node
+void anipp::Shape::export_properties(xml_node & node) {
+    for(auto it=this->properties.begin(); it!=this->properties.end(); ++it) {
+        auto key = it->first;
+        auto value = it->second;
+        auto attr = node.append_attribute(key.c_str());
+        attr.set_value(value.c_str());
+    }
+}
+
 /*
  * Rectangle
  */
@@ -77,7 +99,7 @@ Rect::Rect(double x, double y, double w, double h, double rx, double ry)
     , ry{ry}
 { }
 
-xml_document Rect::export_SVG() const {
+xml_document Rect::export_SVG() {
     xml_document doc;
     auto svg  = doc.append_child("svg");
     svg.append_attribute("version").set_value("1.1");
@@ -91,6 +113,7 @@ xml_document Rect::export_SVG() const {
     y.set_value(this->y);
     width.set_value(this->width);
     height.set_value(this->height);
+    this->export_properties(rect);
     return doc;
 }
 
@@ -112,7 +135,7 @@ Circle::Circle(double cx, double cy, double r)
     , r{r}
 { }
 
-xml_document Circle::export_SVG() const {
+xml_document Circle::export_SVG() {
     xml_document doc;
     auto svg  = doc.append_child("svg");
     svg.append_attribute("version").set_value("1.1");
@@ -124,6 +147,7 @@ xml_document Circle::export_SVG() const {
     cx.set_value(this->cx);
     cy.set_value(this->cy);
     r.set_value(this->r);
+    this->export_properties(circle);
     return doc;
 }
 
@@ -145,7 +169,7 @@ Ellipse::Ellipse(double cx, double cy, double rx, double ry)
         , ry{ry}
 { }
 
-xml_document Ellipse::export_SVG() const {
+xml_document Ellipse::export_SVG() {
     xml_document doc;
     auto svg  = doc.append_child("svg");
     svg.append_attribute("version").set_value("1.1");
@@ -159,6 +183,7 @@ xml_document Ellipse::export_SVG() const {
     cy.set_value(this->cy);
     rx.set_value(this->rx);
     ry.set_value(this->ry);
+    this->export_properties(ellipse);
     return doc;
 }
 
@@ -181,7 +206,7 @@ Line::Line(double x1, double y1, double x2, double y2)
         , y2{y2}
 { }
 
-xml_document Line::export_SVG() const {
+xml_document Line::export_SVG() {
     xml_document doc;
     auto svg  = doc.append_child("svg");
     svg.append_attribute("version").set_value("1.1");
@@ -195,6 +220,7 @@ xml_document Line::export_SVG() const {
     y1.set_value(this->y1);
     x2.set_value(this->x2);
     y2.set_value(this->y2);
+    this->export_properties(line);
     return doc;
 }
 
@@ -215,7 +241,7 @@ Polyline::Polyline(vector<Point> & points)
         : points(points)
 { }
 
-xml_document Polyline::export_SVG() const {
+xml_document Polyline::export_SVG() {
     xml_document doc;
     auto svg  = doc.append_child("svg");
     svg.append_attribute("version").set_value("1.1");
@@ -223,6 +249,7 @@ xml_document Polyline::export_SVG() const {
     auto polyline = svg.append_child("polyline");
     auto points = polyline.append_attribute("points");
     points.set_value(toString(this->points).c_str());
+    this->export_properties(polyline);
     return doc;
 }
 
@@ -240,7 +267,7 @@ Polygon::Polygon(vector<Point> & points)
         : points(points)
 { }
 
-xml_document Polygon::export_SVG() const {
+xml_document Polygon::export_SVG() {
     xml_document doc;
     auto svg  = doc.append_child("svg");
     svg.append_attribute("version").set_value("1.1");
@@ -248,6 +275,7 @@ xml_document Polygon::export_SVG() const {
     auto polygon= svg.append_child("polygon");
     auto points = polygon.append_attribute("points");
     points.set_value(toString(this->points).c_str());
+    this->export_properties(polygon);
     return doc;
 }
 
