@@ -325,11 +325,6 @@ ostream& Path::print(ostream& out) const {
  * See standard https://www.w3.org/TR/SVG/paths.html
  */
  PathDescription::PathDescription(string s) {
-     // remove the spaces first
-     // from:
- //  https://stackoverflow.com/questions/14233065/remove-whitespace-in-stdstring
-     // s.erase(remove_if(s.begin(), s.end(), ::isspace), s.end());
-     pegtl::file_input<> in(s);
      cout << s << '\n';
  }
 

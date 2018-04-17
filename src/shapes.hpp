@@ -2,7 +2,7 @@
 #define __SHAPES_HPP__
 
 #include "animate.hpp"
-#include "parser.hpp"
+// #include "parser.hpp"
 using namespace std;
 using namespace pugi;
 
