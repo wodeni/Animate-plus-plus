@@ -7,17 +7,8 @@
 #ifndef __ANIMATE_HPP__
 #define __ANIMATE_HPP__
 
-#include <iostream>
-#include <sstream>
-#include <cassert>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
-#include "pugixml.hpp"
+#include "parser.hpp"
 #include "shapes.hpp"
-
-using namespace std;
 
 namespace anipp {
 }

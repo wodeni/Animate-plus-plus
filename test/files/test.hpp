@@ -7,33 +7,29 @@
 
 #include "../../src/animate.hpp"
 
-using namespace std;
-using namespace pugi;
-using namespace anipp;
-
 // load a string filename and print the whole SVG file
-void print_SVG(string);
+void print_SVG(std::string);
 
 // load a rectangle. test on "Rect.svg".
-Rect test_square(string);
+anipp::Rect test_square(std::string);
 
 // load a sphere. test on "Circle.svg".
-Circle test_circle(string);
+anipp::Circle test_circle(std::string);
 
 // load a ellipse. test on "Ellipse.svg".
-Ellipse test_ellipse(string);
+anipp::Ellipse test_ellipse(std::string);
 
 // load a line. test on "Line.svg".
-Line test_line(string);
+anipp::Line test_line(std::string);
 
 // load a polyline. test on "Polyline.svg".
-Polyline test_polyline(string);
+anipp::Polyline test_polyline(std::string);
 
 // load a polygon. test on "Polygon.svg".
-Polygon test_polygon(string);
+anipp::Polygon test_polygon(std::string);
 
 // generic test
 template <typename T>
-void test_shape(T (*test_func)(string), string, string);
+void test_shape(T (*test_func)(std::string), std::string, std::string);
 
 #endif //ANIMATE_PLUS_PLUS_TEST_HPP

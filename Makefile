@@ -9,7 +9,9 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d) /usr/local/Cellar/boost/1.66.0
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+INC_FLAGS := $(addprefix -I,$(INC_DIRS)) -I/usr/local/Cellar/boost/1.66.0/include
+
+LDFLAGS := $(INC_FLAGS) -L/usr/local/Cellar/boost/1.66.0/lib -lboost_regex-mt
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++11
 

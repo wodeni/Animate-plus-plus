@@ -2,6 +2,7 @@
 
 using namespace anipp;
 using namespace std;
+using namespace pugi;
 
 /*
  * Point
@@ -310,23 +311,23 @@ ostream& Polygon::print(ostream& out) const {
 /*
  * Path
  */
-Path::Path(vector<Point>& points) {
+Path::Path(PathDescription d)
+    : d(d)
+{ }
 
-
+xml_document Path::export_SVG() {
+    xml_document doc;
+    auto svg  = doc.append_child("svg");
+    svg.append_attribute("version").set_value("1.1");
+    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
+    return doc;
 }
+
 
 ostream& Path::print(ostream& out) const {
-
+    // TODO
+    return out;
 }
-
-
-/*
- * Path description
- * See standard https://www.w3.org/TR/SVG/paths.html
- */
- PathDescription::PathDescription(string s) {
-     cout << s << '\n';
- }
 
 ostream& operator<< (ostream& out, const anipp::Shape& shp) {
     shp.print(out);

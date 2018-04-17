@@ -1,10 +1,15 @@
 #ifndef __SHAPES_HPP__
 #define __SHAPES_HPP__
 
-#include "animate.hpp"
-// #include "parser.hpp"
-using namespace std;
-using namespace pugi;
+#include <iostream>
+#include <sstream>
+#include <cassert>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+#include "pugixml.hpp"
+#include "parser.hpp"
 
 namespace anipp {
     ///////////////////////////////////////////////////////////////////////////
@@ -19,11 +24,11 @@ namespace anipp {
     class Polyline;
     class Polygon;
     class Path;
-    class PathDescription;
+    class PathDescription; // see parser.hpp
     ///////////////////////////////////////////////////////////////////////////
 
-    typedef map<string, string> Properties;
-    typedef map<string, set<string>> Table;
+    typedef std::map<std::string, std::string> Properties;
+    typedef std::map<std::string, std::set<std::string>> Table;
 
     const Table internal_properties (
             {
@@ -51,12 +56,12 @@ namespace anipp {
         Animator animate;      // The animator of a graphical primitive
         Properties properties; // CSS styling properties of the object
     public:
-        virtual ostream& print(ostream& out) const = 0;
-        virtual xml_document export_SVG() = 0;
+        virtual std::ostream& print(std::ostream& out) const = 0;
+        virtual pugi::xml_document export_SVG() = 0;
         virtual Properties get_properties() const {return this->properties;}
-        void print_properties(ostream& out) const;
-        void load_properties(xml_node & node, string type) ;
-        void export_properties(xml_node & node) ;
+        void print_properties(std::ostream& out) const;
+        void load_properties(pugi::xml_node & node, std::string type) ;
+        void export_properties(pugi::xml_node & node) ;
     };
 
     /*
@@ -64,12 +69,12 @@ namespace anipp {
      */
     class Group : public Shape {
     private:
-        vector<Shape> shapes;
+        std::vector<Shape> shapes;
     public:
         Group();
-        Group(vector<Shape>&);
+        Group(std::vector<Shape>&);
         ~Group();
-        ostream& print(ostream& out) const;
+        std::ostream& print(std::ostream& out) const;
     };
 
     /*
@@ -81,13 +86,13 @@ namespace anipp {
         double y;
     public:
         Point(double, double);
-        string display() const; // print (x y)
-        xml_document export_SVG() ;
-        ostream& print(ostream& out) const;
+        std::string display() const; // print (x y)
+        pugi::xml_document export_SVG() ;
+        std::ostream& print(std::ostream& out) const;
     };
 
-    vector<Point> load_points(string str);
-    string toString(vector<Point> vec);
+    std::vector<Point> load_points(std::string str);
+    std::string toString(std::vector<Point> vec);
 
     /*
      * Circle class
@@ -99,8 +104,8 @@ namespace anipp {
         double r; // the radius of the circle
     public:
         Circle(double, double, double);
-        xml_document export_SVG() ;
-        ostream& print(ostream& out) const;
+        pugi::xml_document export_SVG() ;
+        std::ostream& print(std::ostream& out) const;
     };
 
     /*
@@ -117,8 +122,8 @@ namespace anipp {
     public:
         Rect(double, double, double, double, double rx=0, double ry=0);
         ~Rect() {}
-        xml_document export_SVG() ;
-        ostream& print(ostream& out) const;
+        pugi::xml_document export_SVG() ;
+        std::ostream& print(std::ostream& out) const;
     };
 
     /*
@@ -132,8 +137,8 @@ namespace anipp {
         double cy; // The y position of the center of the ellipse.
     public:
         Ellipse(double, double, double, double);
-        xml_document export_SVG() ;
-        ostream& print(ostream& out) const;
+        pugi::xml_document export_SVG() ;
+        std::ostream& print(std::ostream& out) const;
     };
 
     /*
@@ -147,8 +152,8 @@ namespace anipp {
         double y2; // The y position of point 2.
     public:
         Line(double, double, double, double);
-        xml_document export_SVG() ;
-        ostream& print(ostream& out) const;
+        pugi::xml_document export_SVG() ;
+        std::ostream& print(std::ostream& out) const;
     };
 
     /*
@@ -156,11 +161,11 @@ namespace anipp {
      */
     class Polyline : public Shape {
     private:
-        vector<Point> points; // A list of points
+        std::vector<Point> points; // A list of points
     public:
-        Polyline(vector<Point> &);
-        xml_document export_SVG() ;
-        ostream& print(ostream& out) const;
+        Polyline(std::vector<Point> &);
+        pugi::xml_document export_SVG() ;
+        std::ostream& print(std::ostream& out) const;
     };
 
     /*
@@ -168,36 +173,11 @@ namespace anipp {
      */
     class Polygon : public Shape {
     private:
-        vector<Point> points; // A list of points
+        std::vector<Point> points; // A list of points
     public:
-        Polygon(vector<Point> &);
-        xml_document export_SVG() ;
-        ostream& print(ostream& out) const;
-    };
-
-    /*
-     * Abstract representation of <d> in <path>, which is a path descriptor
-     * Five line command:
-     *   - moveto (M, m)
-     *   - lineto (L, l, H, h, V, v)
-     *   - curveto (C, Q, T, S)
-     *   - arcto (TODO)
-     *   - closepath (Z)
-     */
-
-    class PathDescription {
-        // TODO
-    private:
-        // key: command symbol
-        // value: list of numbers with variable length
-        map<string, vector<double>> commands;
-    public:
-        PathDescription(string path_string);
-        ~PathDescription();
-        void as_string(); // TODO: operator>>?
-        PathDescription& operator>> (pair<string, vector<double>>);
-        // TODO: add handles for modifying a path description
-        void move_to(double, double);
+        Polygon(std::vector<Point> &);
+        pugi::xml_document export_SVG() ;
+        std::ostream& print(std::ostream& out) const;
     };
 
 
@@ -208,13 +188,14 @@ namespace anipp {
     private:
         PathDescription d;
     public:
-        Path(vector<Point> &);
-        ostream& print(ostream& out) const;
+        Path(PathDescription);
+        pugi::xml_document export_SVG();
+        std::ostream& print(std::ostream& out) const;
     };
 }
 
 // A wrapper function that allows `cout << shape` kind of syntax
 // TODO: why do I have to predefine this function here for it to work???
-ostream& operator<< (ostream& out, const anipp::Shape& shp);
+std::ostream& operator<< (std::ostream& out, const anipp::Shape& shp);
 
 #endif
