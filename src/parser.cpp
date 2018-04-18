@@ -25,9 +25,8 @@ namespace anipp {
                 std::vector<double> points;
 
                 // strip off the command char
-                std::string type_str = std::string(1, cmd[0]);
-                std::string type_str_upper = type_str;
-                boost::to_upper(type_str_upper);
+                char type_char = cmd[0];
+                char type_char_upper = std::toupper(type_char);
 
                 cmd = cmd.substr(1);
                 while ( regex_search( cmd, matched, split_matcher ) ) {
@@ -38,16 +37,11 @@ namespace anipp {
                 // BUG: if there is a trailing coordinate, we should push it to the list
                 if(cmd.size() != 0) points.push_back(std::stod(cmd));
 
-                bool uppercase = std::all_of(
-                    type_str.begin(), type_str.end(),
-                    [](char c) { return std::isupper(c); }
-                );
-
                 Command c = {
-                    type_map.left.at(type_str_upper),         // type
-                    type_str,                                 // type_string
-                    uppercase ? ABSOLUTE : RELATIVE,          // relativity
-                    points,                                   // points
+                    type_map.left.at(type_char_upper),            // type
+                    type_char,                                    // type_char
+                    std::isupper(type_char)? ABSOLUTE : RELATIVE, // relativity
+                    points,                                       // points
                 };
                 cmd_list.push_back(c);
             }
@@ -66,7 +60,7 @@ namespace anipp {
                 for(int i = 0; i < pts.size(); ++i) {
                     Command c = {
                         type,
-                        cmd.type_string,
+                        cmd.type_char,
                         cmd.relativity,
                         {pts[i]}
                     };
@@ -88,12 +82,13 @@ namespace anipp {
             CommandType type         = cmd.type;
             std::vector<double> pts  = cmd.points;
             if(pts.size() % 2 != 0)
-            throw "There should even number of points for " + cmd.type_string + " command";
+            throw "There should even number of points for " +
+                std::string(1, cmd.type_char) + " command";
             if(pts.size() > 2) {
                 for(int i = 0; i < pts.size(); i+=2) {
                     Command c = {
                         LINETO,
-                        i == 0 ? cmd.type_string : "L",
+                        i == 0 ? cmd.type_char : 'L',
                         cmd.relativity,
                         {pts[i], pts[i+1]}
                     };
@@ -145,22 +140,20 @@ namespace anipp {
 
         void test_parser(std::string test) {
             Commands cmds = parse(test);
-            for(auto c : cmds) {
-                std::cout << c.type_string << ": ";
-                print(c.points);
-            }
+            for(auto c : cmds)
+                std::cout << c << '\n';
         }
 
     }
 
-    /*
-    * Path description
-    * See standard https://www.w3.org/TR/SVG/paths.html
-    */
-    PathDescription::PathDescription(std::string s)
-    : commands(parser::parse(s))
-    { }
-
+    // /*
+    // * Path description
+    // * See standard https://www.w3.org/TR/SVG/paths.html
+    // */
+    // PathDescription::PathDescription(std::string s)
+    // : commands(parser::parse(s))
+    // { }
+    //
     // ostream& operator<< (ostream& out, const anipp::Shape& shp) {
     //     shp.print(out);
     //     return out;

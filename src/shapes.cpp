@@ -311,21 +311,26 @@ ostream& Polygon::print(ostream& out) const {
 /*
  * Path
  */
-Path::Path(PathDescription d)
-    : d(d)
-{ }
+Path::Path(string path_string) {
+    this->cmds = parser::parse(path_string);
+}
 
 xml_document Path::export_SVG() {
     xml_document doc;
     auto svg  = doc.append_child("svg");
     svg.append_attribute("version").set_value("1.1");
     svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
+    auto path = svg.append_child("path");
+    auto d = path.append_attribute("d");
+    d.set_value(toString(this->cmds).c_str());
+    this->export_properties(path);
     return doc;
 }
 
 
 ostream& Path::print(ostream& out) const {
-    // TODO
+    for(auto c : this->cmds)
+        std::cout << c << '\n';
     return out;
 }
 

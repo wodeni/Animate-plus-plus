@@ -14,49 +14,22 @@ namespace anipp {
 
     namespace parser {
 
-        // Types and constants
-
-        enum Relativity { ABSOLUTE, RELATIVE };
-        enum CommandType {
-            MOVETO,           // M or m
-            CLOSEPATH,        // Z or z (same)
-            LINETO,           // L or l
-            HORIZONTAL,       // H or h
-            VERTICAL,         // V or v
-            QUDRATIC,         // Q or q
-            SMOOTH_QUDRATIC,  // T or t
-            CUBIC,            // C or c
-            SMOOTH_CUBIC,     // S or s
-            ELLIPTICAL,       // A or a
-        };
-
-        // structure that represents a command in an SVG path
-        struct Command {
-            CommandType         type;
-            std::string         type_string;
-            Relativity          relativity;
-            std::vector<double> points;
-        };
-
-        // container for a list of commands
-        typedef std::vector<Command> Commands;
-
         // a map that maps a string representation of a command type to the enum
         // representation and vice versa. Uses boost's bidirectional map
         // TODO: change to normal std::map
-        typedef boost::bimap< std::string, CommandType > TypeMap;
+        typedef boost::bimap< char, CommandType > TypeMap;
 
         static std::vector<TypeMap::value_type > type_map_vec = {
-            {"M", MOVETO},
-            {"Z", CLOSEPATH},
-            {"L", LINETO},
-            {"H", HORIZONTAL},
-            {"V", VERTICAL},
-            {"Q", QUDRATIC},
-            {"T", SMOOTH_QUDRATIC},
-            {"C", CUBIC},
-            {"S", SMOOTH_CUBIC},
-            {"A", ELLIPTICAL}
+            {'M', MOVETO},
+            {'Z', CLOSEPATH},
+            {'L', LINETO},
+            {'H', HORIZONTAL},
+            {'V', VERTICAL},
+            {'Q', QUDRATIC},
+            {'T', SMOOTH_QUDRATIC},
+            {'C', CUBIC},
+            {'S', SMOOTH_CUBIC},
+            {'A', ELLIPTICAL}
         };
         static TypeMap type_map =
             TypeMap(type_map_vec.begin(), type_map_vec.end());
@@ -83,30 +56,30 @@ namespace anipp {
         void test_parser(std::string);
 
     }
-
-
-    /*
-    * Abstract representation of <d> in <path>, which is a path descriptor
-    * Five line command:
-    *   - moveto (M, m)
-    *   - lineto (L, l, H, h, V, v)
-    *   - curveto (C, Q, T, S)
-    *   - arcto (TODO)
-    *   - closepath (Z)
-    */
-
-    class PathDescription {
-    private:
-        parser::Commands commands;
-    public:
-        PathDescription(std::string path_string);
-        ~PathDescription();
-        void as_string(); // TODO: operator>>?
-        // PathDescription& operator>> ();
-        // TODO: add handles for modifying a path description
-        void move_to(double, double);
-    };
-
+    //
+    //
+    // /*
+    // * Abstract representation of <d> in <path>, which is a path descriptor
+    // * Five line command:
+    // *   - moveto (M, m)
+    // *   - lineto (L, l, H, h, V, v)
+    // *   - curveto (C, Q, T, S)
+    // *   - arcto (TODO)
+    // *   - closepath (Z)
+    // */
+    //
+    // class PathDescription {
+    // private:
+    //     parser::Commands commands;
+    // public:
+    //     PathDescription(std::string path_string);
+    //     ~PathDescription();
+    //     void as_string(); // TODO: operator>>?
+    //     // PathDescription& operator>> ();
+    //     // TODO: add handles for modifying a path description
+    //     void move_to(double, double);
+    // };
+    //
 }
 
 #endif

@@ -30,6 +30,36 @@ void print_SVG(string filename) {
     }
 }
 
+Path test_path(string filename) {
+    // load
+    xml_document doc;
+    xml_parse_result result = doc.load_file(filename.c_str());
+    if (!result)
+        throw "Failed to load SVG file!";
+    else {
+        xml_node svg  = doc.child("svg");
+        xml_node path = svg.child("path");
+        string d = path.attribute("d").value();
+        Path p(d);
+        p.load_properties(path, "path");
+        return p;
+    }
+}
+
+// TODO
+// Group test_group(string filename) {
+//     // load
+//     xml_document doc;
+//     xml_parse_result result = doc.load_file(filename.c_str());
+//     if (!result)
+//         throw "Failed to load SVG file!";
+//     else {
+//         xml_node svg  = doc.child("svg");
+//         xml_node path = svg.child("path");
+//         string d = rect.attribute("d").value();
+//
+//     }
+// }
 
 Rect test_square(string filename) {
     // load
@@ -152,7 +182,10 @@ int main() {
     test_shape<Line>(test_line, in_path, "test/svgs/Line.svg");
     test_shape<Polyline>(test_polyline, in_path, "test/svgs/Polyline.svg");
     test_shape<Polygon>(test_polygon, in_path, "test/svgs/Polygon.svg");
+    test_shape<Path>(test_path, in_path, "test/svgs/Path.svg");
+    // test_shape<Group>(test_group, in_path, "test/svgs/Group.svg");
 
+    // separate test for SVG path parser
     std::string path = "M3,7 5-6 L1,7 1e2-.4 m-10,10 l10,0       "
                        "V27 89 H23           v10 h10             "
                        "C33,43 38,47 43,47   c0,5 5,10 10,10     "

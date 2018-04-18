@@ -10,6 +10,7 @@
 #include <vector>
 #include "pugixml.hpp"
 #include "parser.hpp"
+#include "utils.hpp"
 
 namespace anipp {
     ///////////////////////////////////////////////////////////////////////////
@@ -24,7 +25,8 @@ namespace anipp {
     class Polyline;
     class Polygon;
     class Path;
-    class PathDescription; // see parser.hpp
+    // class PathDescription; // see parser.hpp
+    // class Commands; // see parser.hpp
     ///////////////////////////////////////////////////////////////////////////
 
     typedef std::map<std::string, std::string> Properties;
@@ -37,7 +39,8 @@ namespace anipp {
                     {"ellipse", {"rx", "ry", "cx", "cy"}},
                     {"line", {"x1", "y1", "x2", "y2"}},
                     {"polyline", {"points"}},
-                    {"polygon", {"points"}}
+                    {"polygon", {"points"}},
+                    {"path", {"d"}}
             }
             );
     // A table contains key value pair of
@@ -186,9 +189,10 @@ namespace anipp {
      */
     class Path : public Shape {
     private:
-        PathDescription d;
+        // PathDescription d;
+        Commands cmds;
     public:
-        Path(PathDescription);
+        Path(std::string);
         pugi::xml_document export_SVG();
         std::ostream& print(std::ostream& out) const;
     };

@@ -51,8 +51,9 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 # 	cldoc serve html
 
 
-.PHONY: clean
+.PHONY: clean all
 
+all: clean $(BUILD_DIR)/$(TARGET_EXEC) 
 clean:
 	$(RM) -r $(BUILD_DIR)
 
