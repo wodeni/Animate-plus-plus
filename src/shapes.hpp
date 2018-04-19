@@ -17,7 +17,6 @@ namespace anipp {
     class Scene;
     class Shape;
     class Group;
-    class Point;
     class Circle;
     class Rect;
     class Ellipse;
@@ -60,7 +59,7 @@ namespace anipp {
         Properties properties; // CSS styling properties of the object
     public:
         virtual std::ostream& print(std::ostream& out) const = 0;
-        virtual pugi::xml_document export_SVG() = 0;
+        virtual pugi::xml_node export_SVG(pugi::xml_document&, bool) = 0;
         virtual Properties get_properties() const {return this->properties;}
         void print_properties(std::ostream& out) const;
         void load_properties(pugi::xml_node & node, std::string type) ;
@@ -76,26 +75,11 @@ namespace anipp {
     public:
         Group();
         Group(std::vector<Shape>&);
+        Group(pugi::xml_document&); // import SVG
         ~Group();
+        pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
-
-    /*
-     * Point class
-     */
-    class Point : public Shape {
-    private:
-        double x;
-        double y;
-    public:
-        Point(double, double);
-        std::string display() const; // print (x y)
-        pugi::xml_document export_SVG() ;
-        std::ostream& print(std::ostream& out) const;
-    };
-
-    std::vector<Point> load_points(std::string str);
-    std::string toString(std::vector<Point> vec);
 
     /*
      * Circle class
@@ -107,7 +91,8 @@ namespace anipp {
         double r; // the radius of the circle
     public:
         Circle(double, double, double);
-        pugi::xml_document export_SVG() ;
+        Circle(pugi::xml_document&); // import SVG
+        pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
 
@@ -124,8 +109,9 @@ namespace anipp {
         double ry;     // The y radius of the corners of the rectangle
     public:
         Rect(double, double, double, double, double rx=0, double ry=0);
+        Rect(pugi::xml_document&); // import SVG
         ~Rect() {}
-        pugi::xml_document export_SVG() ;
+        pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
 
@@ -140,7 +126,8 @@ namespace anipp {
         double cy; // The y position of the center of the ellipse.
     public:
         Ellipse(double, double, double, double);
-        pugi::xml_document export_SVG() ;
+        Ellipse(pugi::xml_document&); // import SVG
+        pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
 
@@ -155,7 +142,8 @@ namespace anipp {
         double y2; // The y position of point 2.
     public:
         Line(double, double, double, double);
-        pugi::xml_document export_SVG() ;
+        Line(pugi::xml_document&); // import SVG
+        pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
 
@@ -167,7 +155,8 @@ namespace anipp {
         std::vector<Point> points; // A list of points
     public:
         Polyline(std::vector<Point> &);
-        pugi::xml_document export_SVG() ;
+        Polyline(pugi::xml_document&); // import SVG
+        pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
 
@@ -179,7 +168,8 @@ namespace anipp {
         std::vector<Point> points; // A list of points
     public:
         Polygon(std::vector<Point> &);
-        pugi::xml_document export_SVG() ;
+        Polygon(pugi::xml_document&); // import SVG
+        pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
 
@@ -193,7 +183,8 @@ namespace anipp {
         Commands cmds;
     public:
         Path(std::string);
-        pugi::xml_document export_SVG();
+        Path(pugi::xml_document&); // import SVG
+        pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
 }

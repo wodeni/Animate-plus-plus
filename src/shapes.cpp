@@ -5,66 +5,9 @@ using namespace std;
 using namespace pugi;
 
 /*
- * Point
+ * Helpers
  */
-Point::Point(double x, double y)
-        : x{x}
-        , y{y}
-{ }
 
-// This print x and y value together with a space between them.
-// Used for "toString" method.
-string Point::display() const {
-    return to_string(this->x) + " " + to_string(this->y);
-}
-
-//TODO: is there anyway we can skip virtual function?
-xml_document Point::export_SVG() {
-    xml_document doc;
-    return doc;
-}
-
-ostream& Point::print(ostream& out) const {
-    out << "Point: " <<
-        "x = " << this->x <<
-        " y = " << this->y << "\n";
-    return out;
-}
-
-// This function can be used in constructing polyline and polygon
-// Taking the string as input and return a vector of points.
-// ex:
-// load_points("100 50 40 30") -> {Point(100, 50), Point(40, 30)}
-vector<Point> anipp::load_points(string str) {
-    string buf;
-    stringstream ss(str);
-    vector<string> vec;
-    while(ss >> buf) {
-        vec.push_back(buf);
-    }
-    assert(vec.size()%2 == 0);
-    vector<Point> vec_res;
-    auto it = vec.begin();
-    while(it != vec.end()) {
-        Point p(stod(*it), stod(*(it+1)));
-        vec_res.push_back(p);
-        it += 2;
-    }
-    return vec_res;
-}
-
-// This function can be used in export polyline and polygon
-// Taking a vector of points as input and return a string containing
-// all points in the vector.
-// ex:
-// toString({Point(100, 50), Point(40, 30)}) -> "100 50 40 30"
-string anipp::toString(vector<Point> points) {
-    string res;
-    auto it=points.begin();
-    for(; it!=points.end()-1; ++it)
-        res = res + (*it).display() + " ";
-    return res + (*it).display();
-}
 
 // load properties from string into map
 void anipp::Shape::load_properties(xml_node & node, string type) {
@@ -111,12 +54,18 @@ Rect::Rect(double x, double y, double w, double h, double rx, double ry)
     , ry{ry}
 { }
 
-xml_document Rect::export_SVG() {
-    xml_document doc;
-    auto svg  = doc.append_child("svg");
-    svg.append_attribute("version").set_value("1.1");
-    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
-    auto rect = svg.append_child("rect");
+Rect::Rect(xml_document& doc) {
+    xml_node svg  = doc.child("svg");
+    xml_node rect = svg.child("rect");
+    this->x = stod(rect.attribute("x").value());
+    this->y = stod(rect.attribute("y").value());
+    this->width = stod(rect.attribute("width").value());
+    this->height = stod(rect.attribute("height").value());
+    this->load_properties(rect, "rect");
+}
+
+xml_node Rect::export_SVG(xml_document& doc, bool standalone) {
+    auto rect = doc.append_child("rect");
     auto x    = rect.append_attribute("x");
     auto y    = rect.append_attribute("y");
     auto width  = rect.append_attribute("width");
@@ -126,7 +75,7 @@ xml_document Rect::export_SVG() {
     width.set_value(this->width);
     height.set_value(this->height);
     this->export_properties(rect);
-    return doc;
+    return rect;
 }
 
 ostream& Rect::print(ostream& out) const {
@@ -149,20 +98,25 @@ Circle::Circle(double cx, double cy, double r)
     , r{r}
 { }
 
-xml_document Circle::export_SVG() {
-    xml_document doc;
-    auto svg  = doc.append_child("svg");
-    svg.append_attribute("version").set_value("1.1");
-    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
-    auto circle = svg.append_child("circle");
-    auto cx    = circle.append_attribute("cx");
-    auto cy    = circle.append_attribute("cy");
-    auto r    = circle.append_attribute("r");
+Circle::Circle(xml_document& doc) {
+    xml_node svg  = doc.child("svg");
+    xml_node circle_node = svg.child("circle");
+    this->cx = stod(circle_node.attribute("cx").value());
+    this->cy = stod(circle_node.attribute("cy").value());
+    this->r  = stod(circle_node.attribute("r").value());
+    this->load_properties(circle_node, "circle");
+}
+
+xml_node Circle::export_SVG(xml_document& doc, bool standalone) {
+    auto circle = doc.append_child("circle");
+    auto cx     = circle.append_attribute("cx");
+    auto cy     = circle.append_attribute("cy");
+    auto r      = circle.append_attribute("r");
     cx.set_value(this->cx);
     cy.set_value(this->cy);
     r.set_value(this->r);
     this->export_properties(circle);
-    return doc;
+    return circle;
 }
 
 ostream& Circle::print(ostream& out) const {
@@ -185,22 +139,28 @@ Ellipse::Ellipse(double cx, double cy, double rx, double ry)
         , ry{ry}
 { }
 
-xml_document Ellipse::export_SVG() {
-    xml_document doc;
-    auto svg  = doc.append_child("svg");
-    svg.append_attribute("version").set_value("1.1");
-    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
-    auto ellipse = svg.append_child("ellipse");
-    auto cx    = ellipse.append_attribute("cx");
-    auto cy    = ellipse.append_attribute("cy");
-    auto rx    = ellipse.append_attribute("rx");
-    auto ry    = ellipse.append_attribute("ry");
+Ellipse::Ellipse(xml_document& doc) {
+    xml_node svg  = doc.child("svg");
+    xml_node ellipse_node = svg.child("ellipse");
+    this->cx = stod(ellipse_node.attribute("cx").value());
+    this->cy = stod(ellipse_node.attribute("cy").value());
+    this->rx = stod(ellipse_node.attribute("rx").value());
+    this->ry = stod(ellipse_node.attribute("ry").value());
+    this->load_properties(ellipse_node, "ellipse");
+}
+
+xml_node Ellipse::export_SVG(xml_document& doc, bool standalone) {
+    auto ellipse = doc.append_child("ellipse");
+    auto cx      = ellipse.append_attribute("cx");
+    auto cy      = ellipse.append_attribute("cy");
+    auto rx      = ellipse.append_attribute("rx");
+    auto ry      = ellipse.append_attribute("ry");
     cx.set_value(this->cx);
     cy.set_value(this->cy);
     rx.set_value(this->rx);
     ry.set_value(this->ry);
     this->export_properties(ellipse);
-    return doc;
+    return ellipse;
 }
 
 ostream& Ellipse::print(ostream& out) const {
@@ -224,22 +184,28 @@ Line::Line(double x1, double y1, double x2, double y2)
         , y2{y2}
 { }
 
-xml_document Line::export_SVG() {
-    xml_document doc;
-    auto svg  = doc.append_child("svg");
-    svg.append_attribute("version").set_value("1.1");
-    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
-    auto line = svg.append_child("line");
-    auto x1 = line.append_attribute("x1");
-    auto y1 = line.append_attribute("y1");
-    auto x2 = line.append_attribute("x2");
-    auto y2 = line.append_attribute("y2");
+Line::Line(xml_document& doc) {
+    xml_node svg  = doc.child("svg");
+    xml_node line_node = svg.child("line");
+    this->x1 = stod(line_node.attribute("x1").value());
+    this->y1 = stod(line_node.attribute("y1").value());
+    this->x2 = stod(line_node.attribute("x2").value());
+    this->y2 = stod(line_node.attribute("y2").value());
+    this->load_properties(line_node, "line");
+}
+
+xml_node Line::export_SVG(xml_document& doc, bool standalone) {
+    auto line = doc.append_child("line");
+    auto x1   = line.append_attribute("x1");
+    auto y1   = line.append_attribute("y1");
+    auto x2   = line.append_attribute("x2");
+    auto y2   = line.append_attribute("y2");
     x1.set_value(this->x1);
     y1.set_value(this->y1);
     x2.set_value(this->x2);
     y2.set_value(this->y2);
     this->export_properties(line);
-    return doc;
+    return line;
 }
 
 ostream& Line::print(ostream& out) const {
@@ -261,22 +227,25 @@ Polyline::Polyline(vector<Point> & points)
         : points(points)
 { }
 
-xml_document Polyline::export_SVG() {
-    xml_document doc;
-    auto svg  = doc.append_child("svg");
-    svg.append_attribute("version").set_value("1.1");
-    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
-    auto polyline = svg.append_child("polyline");
-    auto points = polyline.append_attribute("points");
+Polyline::Polyline(xml_document& doc) {
+    xml_node svg  = doc.child("svg");
+    xml_node polyline_node = svg.child("polyline");
+    this->points = load_points(polyline_node.attribute("points").value());
+    this->load_properties(polyline_node, "polyline");
+}
+
+xml_node Polyline::export_SVG(xml_document& doc, bool standalone) {
+    auto polyline = doc.append_child("polyline");
+    auto points   = polyline.append_attribute("points");
     points.set_value(toString(this->points).c_str());
     this->export_properties(polyline);
-    return doc;
+    return polyline;
 }
 
 ostream& Polyline::print(ostream& out) const {
     out << "Polyline: points = ";
     for(auto it=this->points.begin(); it!=this->points.end(); ++it)
-        out << (*it).display() << " ";
+        out << (*it).toString() << " ";
     anipp::Shape::print_properties(out);
     return out;
 }
@@ -288,22 +257,25 @@ Polygon::Polygon(vector<Point> & points)
         : points(points)
 { }
 
-xml_document Polygon::export_SVG() {
-    xml_document doc;
-    auto svg  = doc.append_child("svg");
-    svg.append_attribute("version").set_value("1.1");
-    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
-    auto polygon= svg.append_child("polygon");
+Polygon::Polygon(xml_document& doc) {
+    xml_node svg  = doc.child("svg");
+    xml_node polygon_node= svg.child("polygon");
+    this->points = load_points(polygon_node.attribute("points").value());
+    this->load_properties(polygon_node, "polygon");
+}
+
+xml_node Polygon::export_SVG(xml_document& doc, bool standalone) {
+    auto polygon = doc.append_child("polygon");
     auto points = polygon.append_attribute("points");
     points.set_value(toString(this->points).c_str());
     this->export_properties(polygon);
-    return doc;
+    return polygon;
 }
 
 ostream& Polygon::print(ostream& out) const {
     out << "Polygon: points = ";
     for(auto it=this->points.begin(); it!=this->points.end(); ++it)
-        out << (*it).display() << " ";
+        out << (*it).toString() << " ";
     anipp::Shape::print_properties(out);
     return out;
 }
@@ -315,16 +287,20 @@ Path::Path(string path_string) {
     this->cmds = parser::parse(path_string);
 }
 
-xml_document Path::export_SVG() {
-    xml_document doc;
-    auto svg  = doc.append_child("svg");
-    svg.append_attribute("version").set_value("1.1");
-    svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
-    auto path = svg.append_child("path");
+Path::Path(xml_document& doc) {
+    xml_node svg  = doc.child("svg");
+    xml_node path = svg.child("path");
+    string d      = path.attribute("d").value();
+    this->cmds = parser::parse(d);
+    this->load_properties(path, "path");
+}
+
+xml_node Path::export_SVG(xml_document& doc, bool standalone) {
+    auto path = doc.append_child("path");
     auto d = path.append_attribute("d");
     d.set_value(toString(this->cmds).c_str());
     this->export_properties(path);
-    return doc;
+    return path;
 }
 
 

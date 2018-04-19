@@ -9,6 +9,7 @@
 
 #include "parser.hpp"
 #include "shapes.hpp"
+#include "utils.hpp"
 
 namespace anipp {
 }

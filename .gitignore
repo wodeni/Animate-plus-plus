@@ -4,6 +4,7 @@
 .LSOverride
 build/
 include/*
+test/output
 
 # NOT ignored files
 !include/pugixml-1.9/src/*

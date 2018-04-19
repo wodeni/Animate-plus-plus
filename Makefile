@@ -2,6 +2,7 @@ TARGET_EXEC ?= a.out
 
 BUILD_DIR ?= ./build
 SRC_DIRS ?= ./src ./include/pugixml-1.9/src ./test
+TEST_OUT_DIR ?= test/output
 # ./include
 
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
@@ -51,12 +52,15 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 # 	cldoc serve html
 
 
-.PHONY: clean all
+.PHONY: clean all test
 
 all: clean $(BUILD_DIR)/$(TARGET_EXEC) 
 clean:
-	$(RM) -r $(BUILD_DIR)
+	$(RM) -r $(BUILD_DIR) test/output
 
 -include $(DEPS)
+
+test: clean $(BUILD_DIR)/$(TARGET_EXEC) 
+	$(MKDIR_P)  $(TEST_OUT_DIR)
 
 MKDIR_P ?= mkdir -p

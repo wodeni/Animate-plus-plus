@@ -1,8 +1,11 @@
 #ifndef __UTILS_HPP__
 #define __UTILS_HPP__
 
+#include <cassert>
 #include <vector>
+#include <sstream>
 #include <iostream>
+#include "pugixml.hpp"
 
 
 namespace anipp {
@@ -36,9 +39,31 @@ namespace anipp {
 
     std::string toString(Commands);
 
+    /*
+     * Point class
+     */
+    class Point {
+    private:
+        double x;
+        double y;
+    public:
+        Point(double, double);
+        std::string toString() const; // print (x y)
+        std::ostream& print(std::ostream& out) const;
+    };
+
+    std::vector<Point> load_points(std::string str);
+    std::string toString(std::vector<Point> vec);
+
     // BUG: linker error if the function is uncommented
     // template<typename Container>
     // void print_container(const Container&);
+
+    /*
+     * SVG helpers
+     */
+    // pugi::xml_node SVG_header();
+    pugi::xml_node SVG_header(pugi::xml_document& );
 }
 
 // print out function for a command in the format of "<cmd-char>: <list-of-pts>"
