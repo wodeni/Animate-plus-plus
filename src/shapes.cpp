@@ -11,8 +11,8 @@ using namespace pugi;
 
 // load properties from string into map
 void anipp::Shape::load_properties(xml_node & node, string type) {
-    auto it = internal_properties.find(type);
-    assert(it != internal_properties.end());
+    auto it = default_properties.find(type);
+    assert(it != default_properties.end());
     set<string> variables = it -> second;
     for (auto ait = node.attributes_begin(); ait != node.attributes_end(); ++ait) {
         if(variables.find(ait->name()) == variables.end()) {
@@ -41,6 +41,44 @@ void anipp::Shape::print_properties(ostream& out) const {
     out << "\n";
 }
 
+ShapePtr anipp::get_shape(pugi::xml_node node) {
+    std::string name = node.name();
+    Shape* res;
+    if     (name == "circle") res = new Circle(node);
+    else if(name == "ellipse") res = new Ellipse(node);
+    else if(name == "g") res = new Group(node);
+    else if(name == "circle") res = new Circle(node);
+    else if(name == "rect") res = new Rect(node);
+    else if(name == "ellipse") res = new Ellipse(node);
+    else if(name == "line") res = new Line(node);
+    else if(name == "polyline") res = new Polyline(node);
+    else if(name == "polygon") res = new Polygon(node);
+    else if(name == "path") res = new Path(node);
+    else throw "getShape: SVG shape element tag not recognized";
+    // https://stackoverflow.com/questions/34882140/why-cant-a-pointer-be-automatically-converted-into-a-unique-ptr-when-returning
+    return ShapePtr{res};
+}
+
+// /*
+//  * Shape base class
+//  */
+//
+// Shape::Shape() {}
+//
+// Shape::~Shape() {}
+//
+// xml_node Shape::export_SVG(xml_document& doc, bool standalone) {
+//     // throw "Shape::export_SVG: the base class version should never be used.";
+//     return xml_node();
+// }
+//
+// std::ostream& Shape::print(std::ostream& out) const {
+//     // throw "Shape::print: the base class version should never be used.";
+//     cout << "Shape::print: the base class version should never be used.\n";
+//     return out;
+// }
+
+
 
 /*
  * Rectangle
@@ -54,9 +92,18 @@ Rect::Rect(double x, double y, double w, double h, double rx, double ry)
     , ry{ry}
 { }
 
-Rect::Rect(xml_document& doc) {
-    xml_node svg  = doc.child("svg");
-    xml_node rect = svg.child("rect");
+Rect::Rect(const Rect& r)
+    : x{r.x}
+    , y{r.y}
+    , width{r.width}
+    , height{r.height}
+    , rx{r.rx}
+    , ry{r.ry}
+{
+    cout << "rect copy constructor\n'";
+}
+
+Rect::Rect(xml_node& rect) {
     this->x = stod(rect.attribute("x").value());
     this->y = stod(rect.attribute("y").value());
     this->width = stod(rect.attribute("width").value());
@@ -98,13 +145,11 @@ Circle::Circle(double cx, double cy, double r)
     , r{r}
 { }
 
-Circle::Circle(xml_document& doc) {
-    xml_node svg  = doc.child("svg");
-    xml_node circle_node = svg.child("circle");
-    this->cx = stod(circle_node.attribute("cx").value());
-    this->cy = stod(circle_node.attribute("cy").value());
-    this->r  = stod(circle_node.attribute("r").value());
-    this->load_properties(circle_node, "circle");
+Circle::Circle(xml_node& circle) {
+    this->cx = stod(circle.attribute("cx").value());
+    this->cy = stod(circle.attribute("cy").value());
+    this->r  = stod(circle.attribute("r").value());
+    this->load_properties(circle, "circle");
 }
 
 xml_node Circle::export_SVG(xml_document& doc, bool standalone) {
@@ -139,14 +184,12 @@ Ellipse::Ellipse(double cx, double cy, double rx, double ry)
         , ry{ry}
 { }
 
-Ellipse::Ellipse(xml_document& doc) {
-    xml_node svg  = doc.child("svg");
-    xml_node ellipse_node = svg.child("ellipse");
-    this->cx = stod(ellipse_node.attribute("cx").value());
-    this->cy = stod(ellipse_node.attribute("cy").value());
-    this->rx = stod(ellipse_node.attribute("rx").value());
-    this->ry = stod(ellipse_node.attribute("ry").value());
-    this->load_properties(ellipse_node, "ellipse");
+Ellipse::Ellipse(xml_node& ellipse) {
+    this->cx = stod(ellipse.attribute("cx").value());
+    this->cy = stod(ellipse.attribute("cy").value());
+    this->rx = stod(ellipse.attribute("rx").value());
+    this->ry = stod(ellipse.attribute("ry").value());
+    this->load_properties(ellipse, "ellipse");
 }
 
 xml_node Ellipse::export_SVG(xml_document& doc, bool standalone) {
@@ -184,14 +227,12 @@ Line::Line(double x1, double y1, double x2, double y2)
         , y2{y2}
 { }
 
-Line::Line(xml_document& doc) {
-    xml_node svg  = doc.child("svg");
-    xml_node line_node = svg.child("line");
-    this->x1 = stod(line_node.attribute("x1").value());
-    this->y1 = stod(line_node.attribute("y1").value());
-    this->x2 = stod(line_node.attribute("x2").value());
-    this->y2 = stod(line_node.attribute("y2").value());
-    this->load_properties(line_node, "line");
+Line::Line(xml_node& line) {
+    this->x1 = stod(line.attribute("x1").value());
+    this->y1 = stod(line.attribute("y1").value());
+    this->x2 = stod(line.attribute("x2").value());
+    this->y2 = stod(line.attribute("y2").value());
+    this->load_properties(line, "line");
 }
 
 xml_node Line::export_SVG(xml_document& doc, bool standalone) {
@@ -227,11 +268,9 @@ Polyline::Polyline(vector<Point> & points)
         : points(points)
 { }
 
-Polyline::Polyline(xml_document& doc) {
-    xml_node svg  = doc.child("svg");
-    xml_node polyline_node = svg.child("polyline");
-    this->points = load_points(polyline_node.attribute("points").value());
-    this->load_properties(polyline_node, "polyline");
+Polyline::Polyline(xml_node& polyline) {
+    this->points = load_points(polyline.attribute("points").value());
+    this->load_properties(polyline, "polyline");
 }
 
 xml_node Polyline::export_SVG(xml_document& doc, bool standalone) {
@@ -257,11 +296,9 @@ Polygon::Polygon(vector<Point> & points)
         : points(points)
 { }
 
-Polygon::Polygon(xml_document& doc) {
-    xml_node svg  = doc.child("svg");
-    xml_node polygon_node= svg.child("polygon");
-    this->points = load_points(polygon_node.attribute("points").value());
-    this->load_properties(polygon_node, "polygon");
+Polygon::Polygon(xml_node& polygon) {
+    this->points = load_points(polygon.attribute("points").value());
+    this->load_properties(polygon, "polygon");
 }
 
 xml_node Polygon::export_SVG(xml_document& doc, bool standalone) {
@@ -287,9 +324,7 @@ Path::Path(string path_string) {
     this->cmds = parser::parse(path_string);
 }
 
-Path::Path(xml_document& doc) {
-    xml_node svg  = doc.child("svg");
-    xml_node path = svg.child("path");
+Path::Path(xml_node& path) {
     string d      = path.attribute("d").value();
     this->cmds = parser::parse(d);
     this->load_properties(path, "path");
@@ -307,6 +342,36 @@ xml_node Path::export_SVG(xml_document& doc, bool standalone) {
 ostream& Path::print(ostream& out) const {
     for(auto c : this->cmds)
         std::cout << c << '\n';
+    return out;
+}
+
+/*
+ * Shape Group
+ */
+
+Group::Group(ShapeList& shapes)
+    : shapes(shapes)
+{}
+
+Group::Group(xml_node& group) {
+    for(auto child : group.children()) {
+        auto shp = get_shape(child);
+        this->shapes.push_back(shp);
+    }
+}
+
+xml_node Group::export_SVG(xml_document& doc, bool standalone) {
+    auto group = doc.append_child("g");
+    for(auto& shp : this->shapes) {
+        auto node = shp->export_SVG(doc);
+        group.append_move(node);
+    }
+    return group;
+}
+
+ostream& Group::print(ostream& out) const {
+    for(auto& s : shapes)
+        out << *s << '\n';
     return out;
 }
 

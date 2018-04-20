@@ -30,19 +30,28 @@ void print_SVG(string filename) {
     }
 }
 
+void test_group(string in_path, string out_path) {
+    // load
+    xml_document doc_in;
+    xml_parse_result result = doc_in.load_file(in_path.c_str());
+    if (!result)
+        throw "Failed to load SVG file!";
+    ShapeList shapes;
+    for(auto child : doc_in.child("svg")) {
+        auto shp = get_shape(child);
+        shapes.push_back(shp);
+        cout << *shp << "\n";
+    }
 
-// Group test_group(string filename) {
-//     // load
-//     xml_document doc;
-//     xml_parse_result result = doc.load_file(filename.c_str());
-//     if (!result)
-//         throw "Failed to load SVG file!";
-//     else {
-//         xml_node svg  = doc.child("svg");
-//         xml_node path = svg.child("path");
-//         string d = rect.attribute("d").value();
-//     }
-// }
+    // output the object to an SVG file
+    xml_document doc_out;
+    auto svg = SVG_header(doc_out);
+    for(auto& shp : shapes) {
+        auto node = shp->export_SVG(doc_out);
+        svg.append_move(node);
+    }
+    doc_out.save_file(out_path.c_str());
+}
 
 
 template<typename T>
@@ -66,14 +75,15 @@ void test_shape(string in_path, string out_path) {
 
 int main() {
     string in_path = "test/svgs/sample.svg";
-    test_shape<Rect>(in_path, "test/output/Rect.svg");
-    test_shape<Circle>(in_path, "test/output/Circle.svg");
-    test_shape<Ellipse>(in_path, "test/output/Ellipse.svg");
-    test_shape<Line>(in_path, "test/output/Line.svg");
-    test_shape<Polyline>(in_path, "test/output/Polyline.svg");
-    test_shape<Polygon>(in_path, "test/output/Polygon.svg");
-    test_shape<Path>(in_path, "test/output/Path.svg");
+    // test_shape<Rect>(in_path, "test/output/Rect.svg");
+    // test_shape<Circle>(in_path, "test/output/Circle.svg");
+    // test_shape<Ellipse>(in_path, "test/output/Ellipse.svg");
+    // test_shape<Line>(in_path, "test/output/Line.svg");
+    // test_shape<Polyline>(in_path, "test/output/Polyline.svg");
+    // test_shape<Polygon>(in_path, "test/output/Polygon.svg");
+    // test_shape<Path>(in_path, "test/output/Path.svg");
     // test_shape<Group>(test_group, in_path, "test/svgs/Group.svg");
+    test_group(in_path, "test/svgs/sample_out.svg");
 
     // separate test for SVG path parser
     std::string path = "M3,7 5-6 L1,7 1e2-.4 m-10,10 l10,0       "

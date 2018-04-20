@@ -2,6 +2,7 @@
 #define __SHAPES_HPP__
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <cassert>
 #include <map>
@@ -24,24 +25,23 @@ namespace anipp {
     class Polyline;
     class Polygon;
     class Path;
-    // class PathDescription; // see parser.hpp
-    // class Commands; // see parser.hpp
     ///////////////////////////////////////////////////////////////////////////
 
     typedef std::map<std::string, std::string> Properties;
-    typedef std::map<std::string, std::set<std::string>> Table;
+    typedef std::map<std::string, std::set<std::string>> DefaultProperties;
+    typedef std::shared_ptr<Shape> ShapePtr;
+    typedef std::vector<ShapePtr> ShapeList;
 
-    const Table internal_properties (
-            {
-                    {"circle", {"cx", "cy", "r"}},
-                    {"rect", {"x", "y", "height", "width", "rx", "ry"}},
-                    {"ellipse", {"rx", "ry", "cx", "cy"}},
-                    {"line", {"x1", "y1", "x2", "y2"}},
-                    {"polyline", {"points"}},
-                    {"polygon", {"points"}},
-                    {"path", {"d"}}
-            }
-            );
+    const DefaultProperties default_properties ({
+        {"circle", {"cx", "cy", "r"}},
+        {"rect", {"x", "y", "height", "width", "rx", "ry"}},
+        {"ellipse", {"rx", "ry", "cx", "cy"}},
+        {"line", {"x1", "y1", "x2", "y2"}},
+        {"polyline", {"points"}},
+        {"polygon", {"points"}},
+        {"path", {"d"}}
+    });
+
     // A table contains key value pair of
     // shape and necessary properties
     // We ignore those properties when we
@@ -58,9 +58,11 @@ namespace anipp {
         Animator animate;      // The animator of a graphical primitive
         Properties properties; // CSS styling properties of the object
     public:
+        // Shape();
+        // ~Shape();
         virtual std::ostream& print(std::ostream& out) const = 0;
-        virtual pugi::xml_node export_SVG(pugi::xml_document&, bool) = 0;
-        virtual Properties get_properties() const {return this->properties;}
+        virtual pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false) = 0;
+        Properties get_properties() const { return this->properties; }
         void print_properties(std::ostream& out) const;
         void load_properties(pugi::xml_node & node, std::string type) ;
         void export_properties(pugi::xml_node & node) ;
@@ -71,12 +73,11 @@ namespace anipp {
      */
     class Group : public Shape {
     private:
-        std::vector<Shape> shapes;
+        ShapeList shapes;
     public:
         Group();
-        Group(std::vector<Shape>&);
-        Group(pugi::xml_document&); // import SVG
-        ~Group();
+        Group(ShapeList&);
+        Group(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -91,7 +92,7 @@ namespace anipp {
         double r; // the radius of the circle
     public:
         Circle(double, double, double);
-        Circle(pugi::xml_document&); // import SVG
+        Circle(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -109,10 +110,12 @@ namespace anipp {
         double ry;     // The y radius of the corners of the rectangle
     public:
         Rect(double, double, double, double, double rx=0, double ry=0);
-        Rect(pugi::xml_document&); // import SVG
-        ~Rect() {}
+        Rect(pugi::xml_node&); // import SVG
+        Rect(const Rect&); // copy constructor
+        // ~Rect() {} // TODO: destructor needed?
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
-        std::ostream& print(std::ostream& out) const;
+        virtual std::ostream& print(std::ostream& out) const;
+        double getX() { return x; }
     };
 
     /*
@@ -126,7 +129,7 @@ namespace anipp {
         double cy; // The y position of the center of the ellipse.
     public:
         Ellipse(double, double, double, double);
-        Ellipse(pugi::xml_document&); // import SVG
+        Ellipse(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -142,7 +145,7 @@ namespace anipp {
         double y2; // The y position of point 2.
     public:
         Line(double, double, double, double);
-        Line(pugi::xml_document&); // import SVG
+        Line(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -155,7 +158,7 @@ namespace anipp {
         std::vector<Point> points; // A list of points
     public:
         Polyline(std::vector<Point> &);
-        Polyline(pugi::xml_document&); // import SVG
+        Polyline(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -168,7 +171,7 @@ namespace anipp {
         std::vector<Point> points; // A list of points
     public:
         Polygon(std::vector<Point> &);
-        Polygon(pugi::xml_document&); // import SVG
+        Polygon(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -183,10 +186,17 @@ namespace anipp {
         Commands cmds;
     public:
         Path(std::string);
-        Path(pugi::xml_document&); // import SVG
+        Path(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // helper functions
+
+    // Based on the name of a node, call appropriate constructor and return
+    // corresponding shape object (e.g.: "circle" -> Circle object)
+    ShapePtr get_shape(pugi::xml_node node);
 }
 
 // A wrapper function that allows `cout << shape` kind of syntax
