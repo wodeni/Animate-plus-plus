@@ -104,21 +104,44 @@ Rect::Rect(const Rect& r)
 }
 
 Rect::Rect(xml_node& rect) {
-    this->x = stod(rect.attribute("x").value());
-    this->y = stod(rect.attribute("y").value());
-    this->width = stod(rect.attribute("width").value());
+    this->x      = stod(rect.attribute("x").value());
+    this->y      = stod(rect.attribute("y").value());
+    this->width  = stod(rect.attribute("width").value());
     this->height = stod(rect.attribute("height").value());
+    string rx_str = rect.attribute("rx").value();
+    string ry_str = rect.attribute("ry").value();
+    this->load_corners(rx_str, ry_str); // rx and ry requires special treatments
     this->load_properties(rect, "rect");
 }
 
+void Rect::load_corners(std::string rx_str, std::string ry_str) {
+    // If neither ‘rx’ nor ‘ry’ are properly specified, then set both rx and ry to 0. (This will result in square corners.)
+    double rx, ry;
+    if(!rx_str.empty()) rx = stod(rx_str); else rx = 0;
+    if(!ry_str.empty()) ry = stod(ry_str); else ry = 0;
+    // Otherwise, if a properly specified value is provided for ‘rx’, but not for ‘ry’, then set both rx and ry to the value of ‘rx’.
+    if(!rx_str.empty()) ry = rx;
+    // Otherwise, if a properly specified value is provided for ‘ry’, but not for ‘rx’, then set both rx and ry to the value of ‘ry’.
+    if(!rx_str.empty()) rx = ry;
+    // If rx is greater than half of ‘width’, then set rx to half of ‘width’.
+    if(rx > this->width)  rx = this->width / 2;
+    // If ry is greater than half of ‘height’, then set ry to half of ‘height’.
+    if(ry > this->height) ry = this->height / 2;
+    // The effective values of ‘rx’ and ‘ry’ are rx and ry, respectively.
+    this->rx = rx;
+    this->ry = ry;
+}
+
 xml_node Rect::export_SVG(xml_document& doc, bool standalone) {
-    auto rect = doc.append_child("rect");
-    auto x    = rect.append_attribute("x");
-    auto y    = rect.append_attribute("y");
+    auto rect   = doc.append_child("rect");
+    auto x      = rect.append_attribute("x");
+    auto y      = rect.append_attribute("y");
+    auto rx     = rect.append_attribute("rx");
+    auto ry     = rect.append_attribute("ry");
     auto width  = rect.append_attribute("width");
     auto height = rect.append_attribute("height");
-    x.set_value(this->x);
-    y.set_value(this->y);
+    x.set_value(this->x); y.set_value(this->y);
+    rx.set_value(this->rx); ry.set_value(this->ry);
     width.set_value(this->width);
     height.set_value(this->height);
     this->export_properties(rect);

@@ -115,7 +115,7 @@ namespace anipp {
         // ~Rect() {} // TODO: destructor needed?
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         virtual std::ostream& print(std::ostream& out) const;
-        double getX() { return x; }
+        void load_corners(std::string, std::string);
     };
 
     /*
