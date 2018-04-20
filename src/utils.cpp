@@ -20,6 +20,14 @@ ostream& operator<< (ostream& out, const anipp::Command& cmd) {
     return out;
 }
 
+// https://stackoverflow.com/questions/13686482/c11-stdto-stringdouble-no-trailing-zeros/13709929
+string anipp::dtos(double d) {
+    std::string str{std::to_string (d)};
+    int offset{1};
+    if (str.find_last_not_of('0') == str.find('.')) { offset = 0; } str.erase(str.find_last_not_of('0') + offset, std::string::npos); 
+    return str;
+}
+
 string anipp::toString(Commands cmds) {
     string res;
     for(Command c : cmds) {
@@ -29,7 +37,7 @@ string anipp::toString(Commands cmds) {
         res += type;
         res += " ";
         for(double p : c.points) {
-            res += to_string(p);
+            res += dtos(p);
             res += " ";
         }
     }
@@ -46,7 +54,7 @@ Point::Point(double x, double y)
 
 // This print x and y value together with a space between them.
 string Point::toString() const {
-    return to_string(this->x) + " " + to_string(this->y);
+    return dtos(this->x) + " " + dtos(this->y);
 }
 
 // This function can be used in constructing polyline and polygon

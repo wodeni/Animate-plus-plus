@@ -51,14 +51,13 @@ void test_group(string in_path, string out_path) {
         shapes.push_back(shp);
         cout << *shp << "\n";
     }
+    Group g(shapes);
 
     // output the object to an SVG file
     xml_document doc_out;
-    auto svg = SVG_header(doc_out);
-    for(auto& shp : shapes) {
-        auto node = shp->export_SVG(doc_out);
-        svg.append_move(node);
-    }
+    auto svg  = SVG_header(doc_out);
+    auto node = g.export_SVG(doc_out);
+    svg.append_move(node);
     doc_out.save_file(out_path.c_str());
 }
 

@@ -53,6 +53,7 @@ namespace anipp {
     };
 
     std::vector<Point> load_points(std::string str);
+    // same as std::to_string, but removes the trailing zeros
     std::string toString(std::vector<Point> vec);
 
     // BUG: linker error if the function is uncommented
@@ -64,6 +65,7 @@ namespace anipp {
      */
     // pugi::xml_node SVG_header();
     pugi::xml_node SVG_header(pugi::xml_document& );
+    std::string dtos(double);
 }
 
 // print out function for a command in the format of "<cmd-char>: <list-of-pts>"
