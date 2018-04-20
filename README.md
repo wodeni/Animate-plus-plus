@@ -4,11 +4,12 @@ Animate++ is a C++ library that lets you rapidly compose beautiful vector graphi
 
 ## Getting started
 
-TBD
+- To build the project
+
 
 ## Dependencies
 
-- rapidxml
+- pugixml: `1.9`
 
 ## Examples
 

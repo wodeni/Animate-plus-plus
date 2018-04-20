@@ -3,10 +3,14 @@
 .AppleDouble
 .LSOverride
 build/
+include/*
+test/output
+
+# NOT ignored files
+!include/pugixml-1.9/src/*
 
 # Icon must end with two \r
 Icon
-
 
 # Thumbnails
 ._*

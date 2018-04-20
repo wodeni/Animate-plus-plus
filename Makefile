@@ -1,18 +1,20 @@
 TARGET_EXEC ?= a.out
 
 BUILD_DIR ?= ./build
-SRC_DIRS ?= ./src
+SRC_DIRS ?= ./src ./include/pugixml-1.9/src ./test
+TEST_OUT_DIR ?= test/output
 # ./include
-
 
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+INC_DIRS := $(shell find $(SRC_DIRS) -type d) /usr/local/Cellar/boost/1.66.0
+INC_FLAGS := $(addprefix -I,$(INC_DIRS)) -I/usr/local/Cellar/boost/1.66.0/include
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
+LDFLAGS := $(INC_FLAGS) -L/usr/local/Cellar/boost/1.66.0/lib -lboost_regex-mt
+
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++11
 
 COMMON_DOC_FLAGS = --report --merge docs --output html $(SRCS)
 
@@ -50,11 +52,15 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 # 	cldoc serve html
 
 
-.PHONY: clean
+.PHONY: clean all test
 
+all: clean $(BUILD_DIR)/$(TARGET_EXEC) 
 clean:
-	$(RM) -r $(BUILD_DIR)
+	$(RM) -r $(BUILD_DIR) test/output
 
 -include $(DEPS)
+
+test: clean $(BUILD_DIR)/$(TARGET_EXEC) 
+	$(MKDIR_P)  $(TEST_OUT_DIR)
 
 MKDIR_P ?= mkdir -p
