@@ -2,6 +2,7 @@
 #define __UTILS_HPP__
 
 #include <cassert>
+#include <cstdlib>
 #include <vector>
 #include <sstream>
 #include <iostream>
@@ -52,7 +53,6 @@ namespace anipp {
         std::ostream& print(std::ostream& out) const;
     };
 
-    std::vector<Point> load_points(std::string str);
     // same as std::to_string, but removes the trailing zeros
     std::string toString(std::vector<Point> vec);
 
@@ -66,6 +66,7 @@ namespace anipp {
     // pugi::xml_node SVG_header();
     pugi::xml_node SVG_header(pugi::xml_document& );
     std::string dtos(double);
+    void die(std::string);
 }
 
 // print out function for a command in the format of "<cmd-char>: <list-of-pts>"

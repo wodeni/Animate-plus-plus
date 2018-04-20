@@ -44,17 +44,23 @@ void anipp::Shape::print_properties(ostream& out) const {
 ShapePtr anipp::get_shape(pugi::xml_node node) {
     std::string name = node.name();
     Shape* res;
-    if     (name == "circle") res = new Circle(node);
-    else if(name == "ellipse") res = new Ellipse(node);
-    else if(name == "g") res = new Group(node);
-    else if(name == "circle") res = new Circle(node);
-    else if(name == "rect") res = new Rect(node);
-    else if(name == "ellipse") res = new Ellipse(node);
-    else if(name == "line") res = new Line(node);
-    else if(name == "polyline") res = new Polyline(node);
-    else if(name == "polygon") res = new Polygon(node);
-    else if(name == "path") res = new Path(node);
-    else throw "getShape: SVG shape element tag not recognized";
+    try {
+        if     (name == "circle") res = new Circle(node);
+        else if(name == "ellipse") res = new Ellipse(node);
+        else if(name == "g") res = new Group(node);
+        else if(name == "circle") res = new Circle(node);
+        else if(name == "rect") res = new Rect(node);
+        else if(name == "ellipse") res = new Ellipse(node);
+        else if(name == "line") res = new Line(node);
+        else if(name == "polyline") res = new Polyline(node);
+        else if(name == "polygon") res = new Polygon(node);
+        else if(name == "path") res = new Path(node);
+        else throw "getShape: SVG shape element tag not recognized";
+    } catch(...) {
+        cout << "get_shape: error when processing command: ";
+        node.print(cout);
+        cout << '\n';
+    }
     // https://stackoverflow.com/questions/34882140/why-cant-a-pointer-be-automatically-converted-into-a-unique-ptr-when-returning
     return ShapePtr{res};
 }
@@ -292,7 +298,7 @@ Polyline::Polyline(vector<Point> & points)
 { }
 
 Polyline::Polyline(xml_node& polyline) {
-    this->points = load_points(polyline.attribute("points").value());
+    this->points = parser::parse_points(polyline.attribute("points").value());
     this->load_properties(polyline, "polyline");
 }
 
@@ -320,7 +326,7 @@ Polygon::Polygon(vector<Point> & points)
 { }
 
 Polygon::Polygon(xml_node& polygon) {
-    this->points = load_points(polygon.attribute("points").value());
+    this->points = parser::parse_points(polygon.attribute("points").value());
     this->load_properties(polygon, "polygon");
 }
 
@@ -378,8 +384,14 @@ Group::Group(ShapeList& shapes)
 
 Group::Group(xml_node& group) {
     for(auto child : group.children()) {
+        // cout << "Beginning with: ";
+        // child.print(cout);
+        // cout << '\n';
         auto shp = get_shape(child);
         this->shapes.push_back(shp);
+        // cout << "Done with: ";
+        // child.print(cout);
+        // cout << '\n';
     }
     this->load_properties(group, "group");
 }

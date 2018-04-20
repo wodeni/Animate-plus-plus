@@ -64,6 +64,8 @@ void test_group(string in_path, string out_path) {
 int main() {
     test_group("test/svgs/sample.svg", "test/output/sample_out.svg");
     test_group("test/svgs/tiger.svg", "test/output/tiger_out.svg");
+    test_group("test/svgs/lowpoly-wolf.svg", "test/output/lowpoly-wolf_out.svg");
+    test_group("test/svgs/lowpoly-tiger.svg", "test/output/lowpoly-tiger_out.svg");
 
     // separate test for SVG path parser
     std::string path = "M3,7 5-6 L1,7 1e2-.4 m-10,10 l10,0       "

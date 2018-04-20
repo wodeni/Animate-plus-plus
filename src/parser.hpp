@@ -34,7 +34,6 @@ namespace anipp {
         static TypeMap type_map =
             TypeMap(type_map_vec.begin(), type_map_vec.end());
 
-
         // matches the spliting points between points
         static boost::regex const split_matcher(
             "\\s*,\\s*|"
@@ -53,6 +52,12 @@ namespace anipp {
         // Top-level function that parses a SVG command string into a list of Command
         // structures
         Commands parse(std::string);
+
+        // This function can be used in constructing polyline and polygon
+        // Taking the string as input and return a vector of points.
+        // ex:
+        // load_points("100 50 40 30") -> {Point(100, 50), Point(40, 30)}
+        std::vector<Point> parse_points(std::string);
         void test_parser(std::string);
 
     }
