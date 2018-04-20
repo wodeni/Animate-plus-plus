@@ -381,6 +381,7 @@ Group::Group(xml_node& group) {
         auto shp = get_shape(child);
         this->shapes.push_back(shp);
     }
+    this->load_properties(group, "group");
 }
 
 xml_node Group::export_SVG(xml_document& doc, bool standalone) {
@@ -389,6 +390,7 @@ xml_node Group::export_SVG(xml_document& doc, bool standalone) {
         auto node = shp->export_SVG(doc);
         group.append_move(node);
     }
+    this->export_properties(group);
     return group;
 }
 

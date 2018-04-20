@@ -104,9 +104,6 @@ namespace anipp {
         Commands validate_commands(Commands cmds) {
 
             Commands valid_cmds;
-            //  If a relative moveto (m) appears as the first element of the path, then it is treated as a pair of absolute coordinates. In this case, subsequent pairs of coordinates are treated as relative even though the initial moveto is interpreted as an absolute moveto.
-            if(cmds[0].type == MOVETO)
-            cmds[0].relativity = ABSOLUTE;
 
             for(auto cmd : cmds) {
                 CommandType type         = cmd.type;
@@ -122,9 +119,15 @@ namespace anipp {
                 }
                 else {
                     valid_cmds.push_back(cmd); // ignored
-                    // std::cout << "Command " + cmd.type_string + " not supported!" << '\n';
+                    // std::cout << "Command not supported: " << cmd.type_char << '\n';
                 }
             }
+
+            //  If a relative moveto (m) appears as the first element of the path, then it is treated as a pair of absolute coordinates. In this case, subsequent pairs of coordinates are treated as relative even though the initial moveto is interpreted as an absolute moveto.
+            if(valid_cmds[0].type == MOVETO &&
+                valid_cmds[0].relativity == RELATIVE)
+                valid_cmds[0].relativity = ABSOLUTE;
+
             return valid_cmds;
         }
 

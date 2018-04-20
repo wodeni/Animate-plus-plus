@@ -39,7 +39,8 @@ namespace anipp {
         {"line", {"x1", "y1", "x2", "y2"}},
         {"polyline", {"points"}},
         {"polygon", {"points"}},
-        {"path", {"d"}}
+        {"path", {"d"}},
+        {"group", { }}
     });
 
     // A table contains key value pair of

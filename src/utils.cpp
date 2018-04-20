@@ -23,7 +23,10 @@ ostream& operator<< (ostream& out, const anipp::Command& cmd) {
 string anipp::toString(Commands cmds) {
     string res;
     for(Command c : cmds) {
-        res += c.type_char;
+        char type = c.relativity == RELATIVE ?
+                    tolower(c.type_char)    :
+                    toupper(c.type_char);
+        res += type;
         res += " ";
         for(double p : c.points) {
             res += to_string(p);
@@ -86,7 +89,7 @@ xml_node anipp::SVG_header(xml_document& doc) {
     svg.append_attribute("version").set_value("1.1");
     svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
     // TODO: what should be the default value?
-    svg.append_attribute("width").set_value("400");
-    svg.append_attribute("height").set_value("400");
+    // svg.append_attribute("width").set_value("1000");
+    // svg.append_attribute("height").set_value("1000");
     return svg;
 }
