@@ -40,25 +40,10 @@ void test_complex_path(string path_string, string out_path) {
 }
 
 void test_group(string in_path, string out_path) {
-    // load
-    xml_document doc_in;
-    xml_parse_result result = doc_in.load_file(in_path.c_str());
-    if (!result)
-        throw "Failed to load SVG file!";
-    ShapeList shapes;
-    for(auto child : doc_in.child("svg")) {
-        auto shp = get_shape(child);
-        shapes.push_back(shp);
-        cout << *shp << "\n";
-    }
-    Group g(shapes);
-
+    // load SVG
+    ShapePtr g = load(in_path);
     // output the object to an SVG file
-    xml_document doc_out;
-    auto svg  = SVG_header(doc_out);
-    auto node = g.export_SVG(doc_out);
-    svg.append_move(node);
-    doc_out.save_file(out_path.c_str());
+    g->save(out_path);
 }
 
 int main() {

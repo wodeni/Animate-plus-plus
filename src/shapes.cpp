@@ -8,6 +8,13 @@ using namespace pugi;
  * Helpers
  */
 
+void anipp::Shape::save(string filename) {
+    xml_document doc_out;
+    auto svg  = SVG_header(doc_out);
+    auto node = this->export_SVG(doc_out);
+    svg.append_move(node);
+    doc_out.save_file(filename.c_str());
+}
 
 // load properties from string into map
 void anipp::Shape::load_properties(xml_node & node, string type) {
@@ -415,4 +422,19 @@ ostream& Group::print(ostream& out) const {
 ostream& operator<< (ostream& out, const anipp::Shape& shp) {
     shp.print(out);
     return out;
+}
+
+ShapePtr anipp::load(string filename) {
+    xml_document doc_in;
+    xml_parse_result result = doc_in.load_file(filename.c_str());
+    if (!result)
+        die("Failed to load SVG file: " + filename);
+    ShapeList shapes;
+    for(auto child : doc_in.child("svg")) {
+        auto shp = get_shape(child);
+        shapes.push_back(shp);
+        cout << *shp << "\n";
+    }
+    Shape* g = new Group(shapes);
+    return ShapePtr{g};
 }

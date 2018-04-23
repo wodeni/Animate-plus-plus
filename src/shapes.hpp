@@ -32,6 +32,10 @@ namespace anipp {
     typedef std::shared_ptr<Shape> ShapePtr;
     typedef std::vector<ShapePtr> ShapeList;
 
+    /*
+     * A table contains key value pair of shape and necessary properties
+     * We ignore those properties when we are parsing external properties.
+     */
     const DefaultProperties default_properties ({
         {"circle", {"cx", "cy", "r"}},
         {"rect", {"x", "y", "height", "width", "rx", "ry"}},
@@ -43,10 +47,6 @@ namespace anipp {
         {"group", { }}
     });
 
-    // A table contains key value pair of
-    // shape and necessary properties
-    // We ignore those properties when we
-    // are parsing external properties.
     class Animator {
         // TODO: to be implemented
     };
@@ -59,14 +59,13 @@ namespace anipp {
         Animator animate;      // The animator of a graphical primitive
         Properties properties; // CSS styling properties of the object
     public:
-        // Shape();
-        // ~Shape();
         virtual std::ostream& print(std::ostream& out) const = 0;
         virtual pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false) = 0;
         Properties get_properties() const { return this->properties; }
         void print_properties(std::ostream& out) const;
         void load_properties(pugi::xml_node & node, std::string type) ;
         void export_properties(pugi::xml_node & node) ;
+        void save(std::string);
     };
 
     /*
@@ -198,6 +197,9 @@ namespace anipp {
     // Based on the name of a node, call appropriate constructor and return
     // corresponding shape object (e.g.: "circle" -> Circle object)
     ShapePtr get_shape(pugi::xml_node node);
+
+    // Load from an SVG file
+    ShapePtr load(std::string);
 }
 
 // A wrapper function that allows `cout << shape` kind of syntax
