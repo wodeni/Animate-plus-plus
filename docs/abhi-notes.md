@@ -1,0 +1,18 @@
+- Tutorial: md (pdf)
+    - background: refer to manual
+- Manual: site (pdf)
+    - background
+- Design document:
+    - alternatives: other libraries / flaws of alternatives
+    - what you did
+        - structure of the code: why the OO design?
+- status document: which version?
+    - ONE 1.2 feature
+- metrics document:
+    - performance: JS vs. C++ (perf, gprof)
+    - size of the doc
+- Test
+    - visual output
+- DEMO
+    - generate animation in the slides using anipp
+- Clean interface
