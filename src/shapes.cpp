@@ -46,12 +46,11 @@ void anipp::Shape::print_attributes(ostream& out) const {
 }
 
 void anipp::Shape::attr(string key, string val) {
-    this->attributes.emplace(key, val);
+    this->attributes[key] = val;
 }
 void anipp::Shape::attr(Attributes attrs) {
-    this->attributes.insert(attrs.begin(), attrs.end());
-    // for(auto a : attributes)
-    //     this->attributes.emplace(a);
+    for(auto a : attrs)
+        this->attributes[a.first] = a.second;
 }
 
 ShapePtr anipp::get_shape(pugi::xml_node node) {

@@ -51,13 +51,12 @@ void test_group(string in_path, string out_path) {
 
 void test_square(string out_path) {
     Rect r(0, 0, 100, 100, 3, 3);
-    // r.attr("fill", "red");
     r.attr({
-        {"fill", "red"},
+        {"fill", "blue"},
         {"stroke", "black"},
         {"stroke-width", "5"}
     });
-
+    r.attr("fill", "red");
     r.save(out_path);
 }
 
