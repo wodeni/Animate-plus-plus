@@ -4,9 +4,9 @@ using namespace anipp;
 using namespace std;
 using namespace pugi;
 
-/*
- * Helpers
- */
+ /////////////
+ // helpers //
+ /////////////
 
 void anipp::Shape::save(string filename) {
     xml_document doc_out;
@@ -16,21 +16,19 @@ void anipp::Shape::save(string filename) {
     doc_out.save_file(filename.c_str());
 }
 
-// load properties from string into map
-void anipp::Shape::load_properties(xml_node & node, string type) {
-    auto it = default_properties.find(type);
-    assert(it != default_properties.end());
+void anipp::Shape::load_attributes(xml_node & node, string type) {
+    auto it = default_attributes.find(type);
+    assert(it != default_attributes.end());
     set<string> variables = it -> second;
     for (auto ait = node.attributes_begin(); ait != node.attributes_end(); ++ait) {
         if(variables.find(ait->name()) == variables.end()) {
-            (this->properties).insert(pair<string, string>(ait->name(), ait->value()));
+            (this->attributes).insert(pair<string, string>(ait->name(), ait->value()));
         }
     }
 }
 
-// export properties to the given node
-void anipp::Shape::export_properties(xml_node & node) {
-    for(auto it=this->properties.begin(); it!=this->properties.end(); ++it) {
+void anipp::Shape::export_attributes(xml_node & node) {
+    for(auto it=this->attributes.begin(); it!=this->attributes.end(); ++it) {
         auto key = it->first;
         auto value = it->second;
         auto attr = node.append_attribute(key.c_str());
@@ -38,14 +36,22 @@ void anipp::Shape::export_properties(xml_node & node) {
     }
 }
 
-// print all properties
-void anipp::Shape::print_properties(ostream& out) const {
-    for(auto it=this->properties.begin(); it!=this->properties.end(); ++it) {
+void anipp::Shape::print_attributes(ostream& out) const {
+    for(auto it=this->attributes.begin(); it!=this->attributes.end(); ++it) {
         auto key = it->first;
         auto value = it->second;
         out << key << " = " << value << ", ";
     }
     out << "\n";
+}
+
+void anipp::Shape::attr(string key, string val) {
+    this->attributes.emplace(key, val);
+}
+void anipp::Shape::attr(Attributes attrs) {
+    this->attributes.insert(attrs.begin(), attrs.end());
+    // for(auto a : attributes)
+    //     this->attributes.emplace(a);
 }
 
 ShapePtr anipp::get_shape(pugi::xml_node node) {
@@ -124,7 +130,7 @@ Rect::Rect(xml_node& rect) {
     string rx_str = rect.attribute("rx").value();
     string ry_str = rect.attribute("ry").value();
     this->load_corners(rx_str, ry_str); // rx and ry requires special treatments
-    this->load_properties(rect, "rect");
+    this->load_attributes(rect, "rect");
 }
 
 void Rect::load_corners(std::string rx_str, std::string ry_str) {
@@ -157,7 +163,7 @@ xml_node Rect::export_SVG(xml_document& doc, bool standalone) {
     rx.set_value(this->rx); ry.set_value(this->ry);
     width.set_value(this->width);
     height.set_value(this->height);
-    this->export_properties(rect);
+    this->export_attributes(rect);
     return rect;
 }
 
@@ -168,7 +174,7 @@ ostream& Rect::print(ostream& out) const {
         ", width = " << this->width <<
         ", height = " << this->height <<
         ", ";
-    anipp::Shape::print_properties(out);
+    anipp::Shape::print_attributes(out);
     return out;
 }
 
@@ -185,7 +191,7 @@ Circle::Circle(xml_node& circle) {
     this->cx = stod(circle.attribute("cx").value());
     this->cy = stod(circle.attribute("cy").value());
     this->r  = stod(circle.attribute("r").value());
-    this->load_properties(circle, "circle");
+    this->load_attributes(circle, "circle");
 }
 
 xml_node Circle::export_SVG(xml_document& doc, bool standalone) {
@@ -196,7 +202,7 @@ xml_node Circle::export_SVG(xml_document& doc, bool standalone) {
     cx.set_value(this->cx);
     cy.set_value(this->cy);
     r.set_value(this->r);
-    this->export_properties(circle);
+    this->export_attributes(circle);
     return circle;
 }
 
@@ -206,7 +212,7 @@ ostream& Circle::print(ostream& out) const {
         ", cy = " << this->cy <<
         ", r = " << this->r <<
         ", ";
-    anipp::Shape::print_properties(out);
+    anipp::Shape::print_attributes(out);
     return out;
 }
 
@@ -225,7 +231,7 @@ Ellipse::Ellipse(xml_node& ellipse) {
     this->cy = stod(ellipse.attribute("cy").value());
     this->rx = stod(ellipse.attribute("rx").value());
     this->ry = stod(ellipse.attribute("ry").value());
-    this->load_properties(ellipse, "ellipse");
+    this->load_attributes(ellipse, "ellipse");
 }
 
 xml_node Ellipse::export_SVG(xml_document& doc, bool standalone) {
@@ -238,7 +244,7 @@ xml_node Ellipse::export_SVG(xml_document& doc, bool standalone) {
     cy.set_value(this->cy);
     rx.set_value(this->rx);
     ry.set_value(this->ry);
-    this->export_properties(ellipse);
+    this->export_attributes(ellipse);
     return ellipse;
 }
 
@@ -249,7 +255,7 @@ ostream& Ellipse::print(ostream& out) const {
         ", rx = " << this->rx <<
         ", ry = " << this->ry <<
         ", ";
-    anipp::Shape::print_properties(out);
+    anipp::Shape::print_attributes(out);
     return out;
 }
 
@@ -268,7 +274,7 @@ Line::Line(xml_node& line) {
     this->y1 = stod(line.attribute("y1").value());
     this->x2 = stod(line.attribute("x2").value());
     this->y2 = stod(line.attribute("y2").value());
-    this->load_properties(line, "line");
+    this->load_attributes(line, "line");
 }
 
 xml_node Line::export_SVG(xml_document& doc, bool standalone) {
@@ -281,7 +287,7 @@ xml_node Line::export_SVG(xml_document& doc, bool standalone) {
     y1.set_value(this->y1);
     x2.set_value(this->x2);
     y2.set_value(this->y2);
-    this->export_properties(line);
+    this->export_attributes(line);
     return line;
 }
 
@@ -292,7 +298,7 @@ ostream& Line::print(ostream& out) const {
         ", x2 = " << this->x2 <<
         ", y2 = " << this->y2 <<
         ", ";
-    anipp::Shape::print_properties(out);
+    anipp::Shape::print_attributes(out);
     return out;
 }
 
@@ -306,14 +312,14 @@ Polyline::Polyline(vector<Point> & points)
 
 Polyline::Polyline(xml_node& polyline) {
     this->points = parser::parse_points(polyline.attribute("points").value());
-    this->load_properties(polyline, "polyline");
+    this->load_attributes(polyline, "polyline");
 }
 
 xml_node Polyline::export_SVG(xml_document& doc, bool standalone) {
     auto polyline = doc.append_child("polyline");
     auto points   = polyline.append_attribute("points");
     points.set_value(toString(this->points).c_str());
-    this->export_properties(polyline);
+    this->export_attributes(polyline);
     return polyline;
 }
 
@@ -321,7 +327,7 @@ ostream& Polyline::print(ostream& out) const {
     out << "Polyline: points = ";
     for(auto it=this->points.begin(); it!=this->points.end(); ++it)
         out << (*it).toString() << " ";
-    anipp::Shape::print_properties(out);
+    anipp::Shape::print_attributes(out);
     return out;
 }
 
@@ -334,14 +340,14 @@ Polygon::Polygon(vector<Point> & points)
 
 Polygon::Polygon(xml_node& polygon) {
     this->points = parser::parse_points(polygon.attribute("points").value());
-    this->load_properties(polygon, "polygon");
+    this->load_attributes(polygon, "polygon");
 }
 
 xml_node Polygon::export_SVG(xml_document& doc, bool standalone) {
     auto polygon = doc.append_child("polygon");
     auto points = polygon.append_attribute("points");
     points.set_value(toString(this->points).c_str());
-    this->export_properties(polygon);
+    this->export_attributes(polygon);
     return polygon;
 }
 
@@ -349,7 +355,7 @@ ostream& Polygon::print(ostream& out) const {
     out << "Polygon: points = ";
     for(auto it=this->points.begin(); it!=this->points.end(); ++it)
         out << (*it).toString() << " ";
-    anipp::Shape::print_properties(out);
+    anipp::Shape::print_attributes(out);
     return out;
 }
 
@@ -363,14 +369,14 @@ Path::Path(string path_string) {
 Path::Path(xml_node& path) {
     string d      = path.attribute("d").value();
     this->cmds = parser::parse(d);
-    this->load_properties(path, "path");
+    this->load_attributes(path, "path");
 }
 
 xml_node Path::export_SVG(xml_document& doc, bool standalone) {
     auto path = doc.append_child("path");
     auto d = path.append_attribute("d");
     d.set_value(toString(this->cmds).c_str());
-    this->export_properties(path);
+    this->export_attributes(path);
     return path;
 }
 
@@ -400,7 +406,7 @@ Group::Group(xml_node& group) {
         // child.print(cout);
         // cout << '\n';
     }
-    this->load_properties(group, "group");
+    this->load_attributes(group, "group");
 }
 
 xml_node Group::export_SVG(xml_document& doc, bool standalone) {
@@ -409,7 +415,7 @@ xml_node Group::export_SVG(xml_document& doc, bool standalone) {
         auto node = shp->export_SVG(doc);
         group.append_move(node);
     }
-    this->export_properties(group);
+    this->export_attributes(group);
     return group;
 }
 

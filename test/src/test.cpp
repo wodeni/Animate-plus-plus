@@ -6,10 +6,13 @@
 
 #include "test.hpp"
 
+#define OUTPUT(s) out_dir + "/" + s
 
 using namespace std;
 using namespace pugi;
 using namespace anipp;
+
+const string out_dir = "test/output";
 
 
 // DEBUG function: load an SVG file and print out all of its nodes
@@ -46,11 +49,36 @@ void test_group(string in_path, string out_path) {
     g->save(out_path);
 }
 
+void test_square(string out_path) {
+    Rect r(0, 0, 100, 100, 3, 3);
+    // r.attr("fill", "red");
+    r.attr({
+        {"fill", "red"},
+        {"stroke", "black"},
+        {"stroke-width", "5"}
+    });
+
+    r.save(out_path);
+}
+
+void test_ani_square(string out_path) {
+    Rect r(0, 0, 100, 100, 3, 3);
+    r.attr("fill", "red");
+    // r.animate.rotate()
+    r.save(out_path);
+}
+
 int main() {
+    // I/O tests
     test_group("test/svgs/sample.svg", "test/output/sample_out.svg");
     test_group("test/svgs/tiger.svg", "test/output/tiger_out.svg");
     test_group("test/svgs/lowpoly-wolf.svg", "test/output/lowpoly-wolf_out.svg");
     test_group("test/svgs/lowpoly-tiger.svg", "test/output/lowpoly-tiger_out.svg");
+    test_group("test/svgs/sketch.svg", "test/output/sketch_out.svg");
+    test_group("test/svgs/satellite.svg", "test/output/satellite_out.svg");
+
+    // Simple shape tests
+    test_square(OUTPUT("simple_rect.svg"));
 
     // separate test for SVG path parser
     std::string path = "M3,7 5-6 L1,7 1e2-.4 m-10,10 l10,0       "

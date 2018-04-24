@@ -8,6 +8,7 @@
 #include <map>
 #include <set>
 #include <string>
+// #include <optional>
 #include <vector>
 #include "pugixml.hpp"
 #include "parser.hpp"
@@ -27,16 +28,16 @@ namespace anipp {
     class Path;
     ///////////////////////////////////////////////////////////////////////////
 
-    typedef std::map<std::string, std::string> Properties;
-    typedef std::map<std::string, std::set<std::string>> DefaultProperties;
+    typedef std::map<std::string, std::string> Attributes;
+    typedef std::map<std::string, std::set<std::string>> DefaultAttributes;
     typedef std::shared_ptr<Shape> ShapePtr;
     typedef std::vector<ShapePtr> ShapeList;
 
     /*
-     * A table contains key value pair of shape and necessary properties
-     * We ignore those properties when we are parsing external properties.
+     * A table contains key value pair of shape and necessary attributes
+     * We ignore those attributes when we are parsing external attributes.
      */
-    const DefaultProperties default_properties ({
+    const DefaultAttributes default_attributes ({
         {"circle", {"cx", "cy", "r"}},
         {"rect", {"x", "y", "height", "width", "rx", "ry"}},
         {"ellipse", {"rx", "ry", "cx", "cy"}},
@@ -47,24 +48,83 @@ namespace anipp {
         {"group", { }}
     });
 
-    class Animator {
-        // TODO: to be implemented
+    enum AnimationType {
+        TRANSFORM,
+        CSS
     };
+
+    class Animation {
+    private:
+        AnimationType type;
+        std::string attributeName; // the attribute to be animated
+        // std::optional<double> dur; // duration of the animation
+        std::string _from;          // the from-value of the animation
+        std::string _to;            // the to-value of the animation
+    public:
+        Animation& from(std::string val);
+        Animation& to(std::string val);
+        // Animation& dur(std::optional<double> dur);
+    };
+
+    /**
+     * An interface to plug in animation to a Shape element
+     */
+    class Animator {
+    private:
+        bool loop;
+        // vector<Animation> animations;
+    public:
+        // void scale();
+        // void skew();
+        Animation& translate(Point from, Point to);
+        Animation& rotate(Point from, Point to);
+    };
+
+    // Animation& translate(Animator& anim, Point from, Point to);
+    // Animation& rotate(Animator& anim, Point from, Point to);
 
     /*
      * Top level abstract class for all shapes
      */
     class Shape {
     private:
-        Animator animate;      // The animator of a graphical primitive
-        Properties properties; // CSS styling properties of the object
+        Attributes attributes; // CSS styling attributes of the object
     public:
+        Animator animate;      // The animator of a graphical primitive
+
         virtual std::ostream& print(std::ostream& out) const = 0;
         virtual pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false) = 0;
-        Properties get_properties() const { return this->properties; }
-        void print_properties(std::ostream& out) const;
-        void load_properties(pugi::xml_node & node, std::string type) ;
-        void export_properties(pugi::xml_node & node) ;
+        Attributes get_attributes() const { return this->attributes; }
+
+        // print all attributes
+        void print_attributes(std::ostream& out) const;
+
+        /**
+         * load attributes from string into map
+         * @param node TODO
+         * @param type TODO
+         */
+        void load_attributes(pugi::xml_node & node, std::string type) ;
+        /**
+         * export attributes to the given node
+         * @param node TODO
+         */
+        void export_attributes(pugi::xml_node & node) ;
+        /**
+         * add an arbitrary attribute to the shape element
+         * @param std::string key
+         * @param std::string value
+         */
+        void attr(std::string, std::string);
+        /**
+         * add multiple attributes to the shape element
+         * @param attributes a map of attributes
+         */
+        void attr(Attributes);
+        /**
+         * Save the Shape as a standalone SVG file
+         * @param filename the name of the output file
+         */
         void save(std::string);
     };
 
