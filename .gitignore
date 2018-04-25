@@ -4,9 +4,10 @@
 .LSOverride
 build/
 test/output
+include/*
 
 # NOT ignored files
-# !include/pugixml-1.9/src/*
+!include/pugixml-1.9/src/*
 
 # Icon must end with two \r
 Icon
