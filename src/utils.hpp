@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <boost/bimap.hpp>
 #include "pugixml.hpp"
 
 
@@ -27,6 +28,28 @@ namespace anipp {
         ELLIPTICAL,       // A or a
     };
 
+    // a map that maps a string representation of a command type to the enum
+    // representation and vice versa. Uses boost's bidirectional map
+    // TODO: change to normal std::map
+    typedef boost::bimap< char, CommandType > TypeMap;
+
+    static std::vector<TypeMap::value_type > type_map_vec = {
+        {'M', MOVETO},
+        {'Z', CLOSEPATH},
+        {'L', LINETO},
+        {'H', HORIZONTAL},
+        {'V', VERTICAL},
+        {'Q', QUDRATIC},
+        {'T', SMOOTH_QUDRATIC},
+        {'C', CUBIC},
+        {'S', SMOOTH_CUBIC},
+        {'A', ELLIPTICAL}
+    };
+    static TypeMap type_map =
+    TypeMap(type_map_vec.begin(), type_map_vec.end());
+    char get_type_char(CommandType, bool isRelative=false);
+
+
     // structure that represents a command in an SVG path
     struct Command {
         CommandType         type;
@@ -37,7 +60,6 @@ namespace anipp {
 
     // container for a list of commands
     typedef std::vector<Command> Commands;
-
     std::string toString(Commands);
 
     /*

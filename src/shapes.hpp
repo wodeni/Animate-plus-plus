@@ -8,7 +8,7 @@
 #include <map>
 #include <set>
 #include <string>
-// #include <optional>
+#include <experimental/optional>
 #include <vector>
 #include "pugixml.hpp"
 #include "parser.hpp"
@@ -49,21 +49,34 @@ namespace anipp {
     });
 
     enum AnimationType {
+        ROTATE,
+        TRANSLATE,
+        SCALE,
+        SKEWX,
+        SKEWY,
         TRANSFORM,
+        COMPOUND,
         CSS
     };
 
     class Animation {
     private:
-        AnimationType type;
-        std::string attributeName; // the attribute to be animated
-        // std::optional<double> dur; // duration of the animation
-        std::string _from;          // the from-value of the animation
-        std::string _to;            // the to-value of the animation
+        AnimationType _type;
+        Attributes attributes;
     public:
-        Animation& from(std::string val);
-        Animation& to(std::string val);
-        // Animation& dur(std::optional<double> dur);
+        std::string _name;                 // the name of the animation
+        Animation& type(AnimationType);
+        Animation& name(std::string);
+        Animation& attribute(std::string);
+        Animation& from(std::string);
+        Animation& to(std::string);
+        Animation& by(std::string);
+        Animation& repeat(double);
+        Animation& loop(bool);
+        Animation& duration(std::string); // TODO: std::chrono::duration?
+        Animation& add(std::string);
+        std::string toString();
+        pugi::xml_node export_SVG(pugi::xml_document&);
     };
 
     /**
@@ -71,13 +84,16 @@ namespace anipp {
      */
     class Animator {
     private:
-        bool loop;
-        // vector<Animation> animations;
+        // bool _loop;
+        std::vector<Animation> animations;
     public:
-        // void scale();
-        // void skew();
-        Animation& translate(Point from, Point to);
-        Animation& rotate(Point from, Point to);
+        Animation& translate(Point, Point, bool relative=false);
+        Animation& rotate(Point, double, Point, double);
+        Animation& scale(Point, Point);
+        bool active();
+
+        std::vector<pugi::xml_node> export_SVG(pugi::xml_document&);
+        std::string toString();
     };
 
     // Animation& translate(Animator& anim, Point from, Point to);
@@ -110,6 +126,10 @@ namespace anipp {
          * @param node TODO
          */
         void export_attributes(pugi::xml_node & node) ;
+
+        // TODO: documentation
+        pugi::xml_node add_animations(pugi::xml_document&, pugi::xml_node);
+
         /**
          * add an arbitrary attribute to the shape element
          * @param std::string key
@@ -249,6 +269,13 @@ namespace anipp {
         Path(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
+        // functions to construct a path
+        Path& closePath();
+        Path& moveTo(double x, double y, bool relative=false);
+        Path& lineTo(double x, double y, bool relative=false);
+        Path& quadraticCurveTo(double cpx, double cpy, double x, double y, bool relative=false);
+        Path& bezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y,  double x, double y, bool relative=false);
+        Path& arcTo(double x1, double y1, double x2, double y2, double radius, bool relative=false);
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -260,6 +287,7 @@ namespace anipp {
 
     // Load from an SVG file
     ShapePtr load(std::string);
+
 }
 
 // A wrapper function that allows `cout << shape` kind of syntax

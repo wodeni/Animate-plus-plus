@@ -168,6 +168,7 @@ namespace anipp {
             return std::move(valid_cmds);
         }
 
+        // TODO: move it to the test suite
         void test_parser(std::string test) {
             Commands cmds = parse(test);
             for(auto c : cmds)

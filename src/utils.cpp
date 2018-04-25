@@ -28,6 +28,12 @@ string anipp::dtos(double d) {
     return str;
 }
 
+char anipp::get_type_char(CommandType t, bool isRelative) {
+    char c = type_map.right.at(t);
+    return isRelative ? tolower(c) : c;
+}
+
+
 string anipp::toString(Commands cmds) {
     string res;
     for(Command c : cmds) {

@@ -5,7 +5,6 @@
 #include <algorithm>    // std::all_of
 #include <cctype>
 #include <boost/regex.hpp>
-#include <boost/bimap.hpp>
 #include <boost/algorithm/string.hpp> // to_upper
 #include <regex>
 #include "utils.hpp"
@@ -13,26 +12,6 @@
 namespace anipp {
 
     namespace parser {
-
-        // a map that maps a string representation of a command type to the enum
-        // representation and vice versa. Uses boost's bidirectional map
-        // TODO: change to normal std::map
-        typedef boost::bimap< char, CommandType > TypeMap;
-
-        static std::vector<TypeMap::value_type > type_map_vec = {
-            {'M', MOVETO},
-            {'Z', CLOSEPATH},
-            {'L', LINETO},
-            {'H', HORIZONTAL},
-            {'V', VERTICAL},
-            {'Q', QUDRATIC},
-            {'T', SMOOTH_QUDRATIC},
-            {'C', CUBIC},
-            {'S', SMOOTH_CUBIC},
-            {'A', ELLIPTICAL}
-        };
-        static TypeMap type_map =
-            TypeMap(type_map_vec.begin(), type_map_vec.end());
 
         // matches the spliting points between points
         static boost::regex const split_matcher(

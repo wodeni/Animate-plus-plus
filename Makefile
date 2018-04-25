@@ -14,7 +14,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS)) -I/usr/local/Cellar/boost/1.66.0/includ
 
 LDFLAGS := $(INC_FLAGS) -L/usr/local/Cellar/boost/1.66.0/lib -lboost_regex-mt
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++11
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++1z
 
 COMMON_DOC_FLAGS = --report --merge docs --output html $(SRCS)
 

@@ -2,11 +2,26 @@
 
 using namespace anipp;
 using namespace std;
+using namespace experimental;
 using namespace pugi;
 
  /////////////
  // helpers //
  /////////////
+
+// xml_attribute append_attribute(xml_node node, string name, string value) {
+//     auto attr = node.append_attribute(name);
+//     attr.set_value(value);
+//     return attr;
+// }
+
+xml_node anipp::Shape::add_animations(xml_document& doc, xml_node parent) {
+    if(!animate.active()) return parent;
+    vector<xml_node> anis = this->animate.export_SVG(doc);
+    for(auto child : anis)
+        parent.append_move(child);
+    return parent;
+}
 
 void anipp::Shape::save(string filename) {
     xml_document doc_out;
@@ -163,7 +178,7 @@ xml_node Rect::export_SVG(xml_document& doc, bool standalone) {
     width.set_value(this->width);
     height.set_value(this->height);
     this->export_attributes(rect);
-    return rect;
+    return this->add_animations(doc, rect);
 }
 
 ostream& Rect::print(ostream& out) const {
@@ -202,7 +217,7 @@ xml_node Circle::export_SVG(xml_document& doc, bool standalone) {
     cy.set_value(this->cy);
     r.set_value(this->r);
     this->export_attributes(circle);
-    return circle;
+    return this->add_animations(doc, circle);
 }
 
 ostream& Circle::print(ostream& out) const {
@@ -244,7 +259,7 @@ xml_node Ellipse::export_SVG(xml_document& doc, bool standalone) {
     rx.set_value(this->rx);
     ry.set_value(this->ry);
     this->export_attributes(ellipse);
-    return ellipse;
+    return this->add_animations(doc, ellipse);
 }
 
 ostream& Ellipse::print(ostream& out) const {
@@ -287,7 +302,7 @@ xml_node Line::export_SVG(xml_document& doc, bool standalone) {
     x2.set_value(this->x2);
     y2.set_value(this->y2);
     this->export_attributes(line);
-    return line;
+    return this->add_animations(doc, line);
 }
 
 ostream& Line::print(ostream& out) const {
@@ -319,7 +334,7 @@ xml_node Polyline::export_SVG(xml_document& doc, bool standalone) {
     auto points   = polyline.append_attribute("points");
     points.set_value(toString(this->points).c_str());
     this->export_attributes(polyline);
-    return polyline;
+    return this->add_animations(doc, polyline);
 }
 
 ostream& Polyline::print(ostream& out) const {
@@ -347,7 +362,7 @@ xml_node Polygon::export_SVG(xml_document& doc, bool standalone) {
     auto points = polygon.append_attribute("points");
     points.set_value(toString(this->points).c_str());
     this->export_attributes(polygon);
-    return polygon;
+    return this->add_animations(doc, polygon);
 }
 
 ostream& Polygon::print(ostream& out) const {
@@ -376,9 +391,54 @@ xml_node Path::export_SVG(xml_document& doc, bool standalone) {
     auto d = path.append_attribute("d");
     d.set_value(toString(this->cmds).c_str());
     this->export_attributes(path);
-    return path;
+    return this->add_animations(doc, path);
 }
 
+Path& Path::closePath() {
+    Command c = { CLOSEPATH, get_type_char(CLOSEPATH), ABSOLUTE, {} };
+    this->cmds.push_back(c);
+    return *this;
+}
+Path& Path::moveTo(double x, double y, bool relative) {
+    Command c = {
+        MOVETO, get_type_char(MOVETO, relative),
+        relative ? RELATIVE : ABSOLUTE, {x, y}
+    };
+    this->cmds.push_back(c);
+    return *this;
+}
+Path& Path::lineTo(double x, double y, bool relative) {
+    Command c = {
+        LINETO, get_type_char(LINETO, relative),
+        relative ? RELATIVE : ABSOLUTE, {x, y}
+    };
+    this->cmds.push_back(c);
+    return *this;
+}
+Path& Path::quadraticCurveTo(double cpx, double cpy, double x, double y, bool relative) {
+    Command c = {
+        SMOOTH_QUDRATIC, get_type_char(SMOOTH_QUDRATIC, relative),
+        relative ? RELATIVE : ABSOLUTE, {cpx, cpy, x, y}
+    };
+    this->cmds.push_back(c);
+    return *this;
+}
+Path& Path::bezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y,  double x, double y, bool relative) {
+    Command c = {
+        SMOOTH_CUBIC, get_type_char(SMOOTH_CUBIC, relative),
+        relative ? RELATIVE : ABSOLUTE, {cp1x, cp1y, cp2x, cp2y, x, y}
+    };
+    this->cmds.push_back(c);
+    return *this;
+}
+Path& Path::arcTo(double x1, double y1, double x2, double y2, double radius, bool relative) {
+    Command c = {
+        ELLIPTICAL, get_type_char(ELLIPTICAL, relative),
+        relative ? RELATIVE : ABSOLUTE, {x1, y1, x2, y2, radius}
+    };
+    this->cmds.push_back(c);
+    return *this;
+}
 
 ostream& Path::print(ostream& out) const {
     for(auto c : this->cmds)
@@ -411,11 +471,12 @@ Group::Group(xml_node& group) {
 xml_node Group::export_SVG(xml_document& doc, bool standalone) {
     auto group = doc.append_child("g");
     for(auto& shp : this->shapes) {
+        // TODO: to be tested
         auto node = shp->export_SVG(doc);
-        group.append_move(node);
+        group.append_move(this->add_animations(doc, node));
     }
     this->export_attributes(group);
-    return group;
+    return this->add_animations(doc, group);
 }
 
 ostream& Group::print(ostream& out) const {
@@ -438,8 +499,150 @@ ShapePtr anipp::load(string filename) {
     for(auto child : doc_in.child("svg")) {
         auto shp = get_shape(child);
         shapes.push_back(shp);
-        cout << *shp << "\n";
+        // cout << *shp << "\n";
     }
     Shape* g = new Group(shapes);
     return ShapePtr{g};
+}
+
+//////////////
+// Animator //
+//////////////
+
+// NOTE: ad-hoc solution is detect whether the animation should use
+// animateTransform
+bool isTransfrom(AnimationType t) {
+    return t == ROTATE    ||
+           t == TRANSLATE ||
+           t == SCALE     ||
+           t == SKEWX     ||
+           t == SKEWY;
+           // t == TRANSFORM; //TODO
+}
+
+Animation& Animator::translate(Point p1, Point p2, bool relative) {
+     Animation ani;
+     ani.type(TRANSLATE)
+        .name("translate")
+        .from(p1.toString());
+    if(relative)
+        ani.by(p2.toString());
+    else
+        ani.to(p2.toString());
+    animations.push_back(ani);
+    return animations.back();
+}
+
+Animation& Animator::rotate(Point c1, double d1, Point c2, double d2) {
+    Animation ani;
+    ani.type(ROTATE)
+       .name("rotate")
+       .from(dtos(d1) + " " + c1.toString())
+       .to  (dtos(d2) + " " + c2.toString());
+   animations.push_back(ani);
+   return animations.back();
+}
+
+Animation& Animator::scale(Point from_scale, Point to_scale) {
+    Animation ani;
+    ani.type(SCALE)
+       .name("scale")
+       .from(from_scale.toString())
+       .to(to_scale.toString());
+    animations.push_back(ani);
+    return animations.back();
+}
+
+// void Animator::loop(bool isLooping) { this->_loop = isLooping; }
+
+string Animator::toString() {
+    string res;
+    for(auto a : this->animations)
+        res += a.toString() + '\n';
+    return res;
+}
+
+vector<xml_node> Animator::export_SVG(xml_document& doc) {
+    vector<xml_node> res;
+    for(auto& a : this->animations) {
+        auto node = a.export_SVG(doc);
+        res.push_back(node);
+    }
+    return res;
+}
+
+bool Animator::active() { return this->animations.size() != 0; }
+
+///////////////
+// Animation //
+///////////////
+
+string Animation::toString() {
+    // TODO
+    // string res = "Attribute to animate: " + this->attributeName;
+                 // "\nfrom: " + this->attributes["from"] +
+                 // "\nto: "   + this->_to;
+    // res += "\nduration: " + (this->dur ? dtos(*this->dur) : "indefinite");
+    // return res;
+}
+
+Animation& Animation::type(AnimationType t) {
+    this->_type = t;
+    return *this;
+}
+Animation& Animation::name(string n) {
+    this->_name = n;
+    return *this;
+}
+Animation& Animation::attribute(string attr) {
+    this->attributes["attributeName"] = attr;
+    return *this;
+}
+
+Animation& Animation::from(string t) {
+    this->attributes["from"] = t;
+    return *this;
+}
+Animation& Animation::to(string t) {
+    this->attributes["to"] = t;
+    return *this;
+}
+Animation& Animation::by(string t) {
+    this->attributes["by"] = t;
+    return *this;
+}
+Animation& Animation::duration(string t) {
+    this->attributes["dur"] = t;
+    return *this;
+}
+Animation& Animation::repeat(double t) {
+    this->attributes["repeatCount"] = dtos(t);
+    return *this;
+}
+Animation& Animation::loop(bool isLooping) {
+    this->attributes["repeatCount"] = "indefinite";
+    return *this;
+}
+
+pugi::xml_node Animation::export_SVG(pugi::xml_document& doc) {
+
+    // figure out which type of animate tag to use and initialize the node
+    string node_name;
+    xml_node ani_node;
+    if(isTransfrom(this->_type)) {
+        node_name = "animateTransform";
+        ani_node = doc.append_child(node_name.c_str());
+        ani_node.append_attribute("attributeName").set_value("transform");
+        ani_node.append_attribute("type").set_value(this->_name.c_str());
+    }
+
+    // custom attributes
+    for(auto it=this->attributes.begin(); it!=this->attributes.end(); ++it) {
+        auto key = it->first;
+        auto value = it->second;
+        auto attr = ani_node.append_attribute(key.c_str());
+        attr.set_value(value.c_str());
+    }
+
+    return ani_node;
 }
