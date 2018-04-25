@@ -2,9 +2,11 @@
 #define __UTILS_HPP__
 
 #include <cassert>
+#include <cstdlib>
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <boost/bimap.hpp>
 #include "pugixml.hpp"
 
 
@@ -26,6 +28,28 @@ namespace anipp {
         ELLIPTICAL,       // A or a
     };
 
+    // a map that maps a string representation of a command type to the enum
+    // representation and vice versa. Uses boost's bidirectional map
+    // TODO: change to normal std::map
+    typedef boost::bimap< char, CommandType > TypeMap;
+
+    static std::vector<TypeMap::value_type > type_map_vec = {
+        {'M', MOVETO},
+        {'Z', CLOSEPATH},
+        {'L', LINETO},
+        {'H', HORIZONTAL},
+        {'V', VERTICAL},
+        {'Q', QUDRATIC},
+        {'T', SMOOTH_QUDRATIC},
+        {'C', CUBIC},
+        {'S', SMOOTH_CUBIC},
+        {'A', ELLIPTICAL}
+    };
+    static TypeMap type_map =
+    TypeMap(type_map_vec.begin(), type_map_vec.end());
+    char get_type_char(CommandType, bool isRelative=false);
+
+
     // structure that represents a command in an SVG path
     struct Command {
         CommandType         type;
@@ -36,7 +60,6 @@ namespace anipp {
 
     // container for a list of commands
     typedef std::vector<Command> Commands;
-
     std::string toString(Commands);
 
     /*
@@ -52,7 +75,6 @@ namespace anipp {
         std::ostream& print(std::ostream& out) const;
     };
 
-    std::vector<Point> load_points(std::string str);
     // same as std::to_string, but removes the trailing zeros
     std::string toString(std::vector<Point> vec);
 
@@ -66,6 +88,7 @@ namespace anipp {
     // pugi::xml_node SVG_header();
     pugi::xml_node SVG_header(pugi::xml_document& );
     std::string dtos(double);
+    void die(std::string);
 }
 
 // print out function for a command in the format of "<cmd-char>: <list-of-pts>"

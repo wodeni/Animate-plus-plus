@@ -17,6 +17,28 @@ namespace anipp {
             return std::move(cmds);
         }
 
+        std::vector<Point> parse_points(std::string str) {
+            std::string pts_str = str;
+            smatch matched;
+            std::vector<double> nums;
+            std::vector<Point> pts;
+
+            while ( regex_search( pts_str, matched, split_matcher ) ) {
+                nums.push_back(std::stod(matched.prefix()));
+                pts_str = matched.suffix();
+            }
+            // BUG: if there is a trailing coordinate, we should push it to the list
+            if(pts_str.size() != 0) nums.push_back(std::stod(pts_str));
+
+            if(nums.size() % 2 != 0)
+                die("<list-of-points> \"" + str + "\" has odd number of numbers!");
+            for(auto it = nums.begin(); it != nums.end(); it += 2) {
+                Point p(*it, *(it+1));
+                pts.push_back(p);
+            }
+            return pts;
+        }
+
         // split a list of commands as a list of objects
         Commands split_commands(std::vector<std::string>& cmds) {
             Commands cmd_list;
@@ -30,12 +52,17 @@ namespace anipp {
 
                 cmd = cmd.substr(1);
                 while ( regex_search( cmd, matched, split_matcher ) ) {
-                    points.push_back(std::stod(matched.prefix()));
+                    // BUG: ignoring failures for now, fix later?
+                    try {
+                        points.push_back(std::stod(matched.prefix()));
+                    } catch(...) { }
                     cmd = matched.suffix();
                 }
 
                 // BUG: if there is a trailing coordinate, we should push it to the list
-                if(cmd.size() != 0) points.push_back(std::stod(cmd));
+                try {
+                    points.push_back(std::stod(cmd));
+                } catch(...) { }
 
                 Command c = {
                     type_map.left.at(type_char_upper),            // type
@@ -141,6 +168,7 @@ namespace anipp {
             return std::move(valid_cmds);
         }
 
+        // TODO: move it to the test suite
         void test_parser(std::string test) {
             Commands cmds = parse(test);
             for(auto c : cmds)

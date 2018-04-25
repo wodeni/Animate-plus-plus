@@ -8,6 +8,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <experimental/optional>
 #include <vector>
 #include "pugixml.hpp"
 #include "parser.hpp"
@@ -27,12 +28,16 @@ namespace anipp {
     class Path;
     ///////////////////////////////////////////////////////////////////////////
 
-    typedef std::map<std::string, std::string> Properties;
-    typedef std::map<std::string, std::set<std::string>> DefaultProperties;
+    typedef std::map<std::string, std::string> Attributes;
+    typedef std::map<std::string, std::set<std::string>> DefaultAttributes;
     typedef std::shared_ptr<Shape> ShapePtr;
     typedef std::vector<ShapePtr> ShapeList;
 
-    const DefaultProperties default_properties ({
+    /*
+     * A table contains key value pair of shape and necessary attributes
+     * We ignore those attributes when we are parsing external attributes.
+     */
+    const DefaultAttributes default_attributes ({
         {"circle", {"cx", "cy", "r"}},
         {"rect", {"x", "y", "height", "width", "rx", "ry"}},
         {"ellipse", {"rx", "ry", "cx", "cy"}},
@@ -43,30 +48,104 @@ namespace anipp {
         {"group", { }}
     });
 
-    // A table contains key value pair of
-    // shape and necessary properties
-    // We ignore those properties when we
-    // are parsing external properties.
-    class Animator {
-        // TODO: to be implemented
+    enum AnimationType {
+        ROTATE,
+        TRANSLATE,
+        SCALE,
+        SKEWX,
+        SKEWY,
+        TRANSFORM,
+        COMPOUND,
+        CSS
     };
+
+    class Animation {
+    private:
+        AnimationType _type;
+        Attributes attributes;
+    public:
+        std::string _name;                 // the name of the animation
+        Animation& type(AnimationType);
+        Animation& name(std::string);
+        Animation& attribute(std::string);
+        Animation& from(std::string);
+        Animation& to(std::string);
+        Animation& by(std::string);
+        Animation& repeat(double);
+        Animation& loop(bool);
+        Animation& duration(std::string); // TODO: std::chrono::duration?
+        Animation& add(std::string);
+        std::string toString();
+        pugi::xml_node export_SVG(pugi::xml_document&);
+    };
+
+    /**
+     * An interface to plug in animation to a Shape element
+     */
+    class Animator {
+    private:
+        // bool _loop;
+        std::vector<Animation> animations;
+    public:
+        Animation& translate(Point, Point, bool relative=false);
+        Animation& rotate(Point, double, Point, double);
+        Animation& scale(Point, Point);
+        bool active();
+
+        std::vector<pugi::xml_node> export_SVG(pugi::xml_document&);
+        std::string toString();
+    };
+
+    // Animation& translate(Animator& anim, Point from, Point to);
+    // Animation& rotate(Animator& anim, Point from, Point to);
 
     /*
      * Top level abstract class for all shapes
      */
     class Shape {
     private:
-        Animator animate;      // The animator of a graphical primitive
-        Properties properties; // CSS styling properties of the object
+        Attributes attributes; // CSS styling attributes of the object
     public:
-        // Shape();
-        // ~Shape();
+        Animator animate;      // The animator of a graphical primitive
+
         virtual std::ostream& print(std::ostream& out) const = 0;
         virtual pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false) = 0;
-        Properties get_properties() const { return this->properties; }
-        void print_properties(std::ostream& out) const;
-        void load_properties(pugi::xml_node & node, std::string type) ;
-        void export_properties(pugi::xml_node & node) ;
+        Attributes get_attributes() const { return this->attributes; }
+
+        // print all attributes
+        void print_attributes(std::ostream& out) const;
+
+        /**
+         * load attributes from string into map
+         * @param node TODO
+         * @param type TODO
+         */
+        void load_attributes(pugi::xml_node & node, std::string type) ;
+        /**
+         * export attributes to the given node
+         * @param node TODO
+         */
+        void export_attributes(pugi::xml_node & node) ;
+
+        // TODO: documentation
+        pugi::xml_node add_animations(pugi::xml_document&, pugi::xml_node);
+
+        /**
+         * add an arbitrary attribute to the shape element
+         * @param std::string key
+         * @param std::string value
+         */
+        void attr(std::string, std::string);
+        /**
+         * add multiple attributes to the shape element
+         * @param attributes a map of attributes
+         */
+        void attr(Attributes);
+        /**
+         * Save the Shape as a standalone SVG file
+         * @param filename the name of the output file
+         */
+        void save(std::string);
     };
 
     /*
@@ -190,6 +269,13 @@ namespace anipp {
         Path(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
+        // functions to construct a path
+        Path& closePath();
+        Path& moveTo(double x, double y, bool relative=false);
+        Path& lineTo(double x, double y, bool relative=false);
+        Path& quadraticCurveTo(double cpx, double cpy, double x, double y, bool relative=false);
+        Path& bezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y,  double x, double y, bool relative=false);
+        Path& arcTo(double x1, double y1, double x2, double y2, double radius, bool relative=false);
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -198,6 +284,10 @@ namespace anipp {
     // Based on the name of a node, call appropriate constructor and return
     // corresponding shape object (e.g.: "circle" -> Circle object)
     ShapePtr get_shape(pugi::xml_node node);
+
+    // Load from an SVG file
+    ShapePtr load(std::string);
+
 }
 
 // A wrapper function that allows `cout << shape` kind of syntax

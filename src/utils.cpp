@@ -24,9 +24,15 @@ ostream& operator<< (ostream& out, const anipp::Command& cmd) {
 string anipp::dtos(double d) {
     std::string str{std::to_string (d)};
     int offset{1};
-    if (str.find_last_not_of('0') == str.find('.')) { offset = 0; } str.erase(str.find_last_not_of('0') + offset, std::string::npos); 
+    if (str.find_last_not_of('0') == str.find('.')) { offset = 0; } str.erase(str.find_last_not_of('0') + offset, std::string::npos);
     return str;
 }
+
+char anipp::get_type_char(CommandType t, bool isRelative) {
+    char c = type_map.right.at(t);
+    return isRelative ? tolower(c) : c;
+}
+
 
 string anipp::toString(Commands cmds) {
     string res;
@@ -57,28 +63,6 @@ string Point::toString() const {
     return dtos(this->x) + " " + dtos(this->y);
 }
 
-// This function can be used in constructing polyline and polygon
-// Taking the string as input and return a vector of points.
-// ex:
-// load_points("100 50 40 30") -> {Point(100, 50), Point(40, 30)}
-vector<Point> anipp::load_points(string str) {
-    string buf;
-    stringstream ss(str);
-    vector<string> vec;
-    while(ss >> buf) {
-        vec.push_back(buf);
-    }
-    assert(vec.size()%2 == 0);
-    vector<Point> vec_res;
-    auto it = vec.begin();
-    while(it != vec.end()) {
-        Point p(stod(*it), stod(*(it+1)));
-        vec_res.push_back(p);
-        it += 2;
-    }
-    return vec_res;
-}
-
 // This function can be used in export polyline and polygon
 // Taking a vector of points as input and return a string containing
 // all points in the vector.
@@ -100,4 +84,9 @@ xml_node anipp::SVG_header(xml_document& doc) {
     // svg.append_attribute("width").set_value("1000");
     // svg.append_attribute("height").set_value("1000");
     return svg;
+}
+
+void anipp::die(string msg) {
+    cout << msg << '\n';
+    exit(-1);
 }
