@@ -97,6 +97,15 @@ void test_ani_translate_abs(string out_path) {
     c.save(out_path);
 }
 
+void test_ani_rotate_complex(string in_path, string out_path) {
+    ShapePtr g = load(in_path);
+    Point center(70, 70);
+    g->animate.rotate(center, 0, center, 360)
+              .duration("10s")
+              .loop(true);
+    g->save(out_path);
+}
+
 void test_ani_rotate(string out_path) {
     Rect r(20, 20, 100, 100, 3, 3);
     r.attr({
@@ -104,7 +113,7 @@ void test_ani_rotate(string out_path) {
         {"stroke", "black"},
         {"stroke-width", "5"}
     });
-    Point center(70, 70);
+    Point center(100, 100);
     r.animate.rotate(center, 0, center, 360)
              .duration("10s")
              .loop(true);
@@ -125,6 +134,7 @@ int main() {
 
     // Elementary animation tests
     test_ani_rotate(OUTPUT("rect_rotate.svg"));
+    test_ani_rotate_complex("test/svgs/tiger.svg", OUTPUT("tiger_rotate.svg"));
     test_ani_scale(OUTPUT("circle_scale.svg"));
     test_ani_translate_abs(OUTPUT("circle_translate_abs.svg"));
     test_ani_translate_rel(OUTPUT("circle_translate_rel.svg"));
