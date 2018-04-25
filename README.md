@@ -1,11 +1,15 @@
+<p align="center">
+    <img src="http://wodenimoni.com/images/anipp-logo.svg" width=100%/>
+</p>
+
 # Animate++
 
 Animate++ is a C++ library that lets you rapidly compose beautiful vector graphics animation.
 
 ## Getting started
 
-- To build the project
-
+- To build the project: `make`
+- To build tests: `make test`
 
 ## Dependencies
 
@@ -13,52 +17,43 @@ Animate++ is a C++ library that lets you rapidly compose beautiful vector graphi
 
 ## Examples
 
-__Input SVG file__:
-```xml
-<svg width="400" height="400" version="1.1" xmlns="http://www.w3.org/2000/svg">
-  <rect x="50" y="50" width="30" height="30" stroke="black" fill="red" stroke-width="1"/>
-</svg>
-```
-
-<p align="center">
-    <img src="docs/assets/progress-report-02b00.png" width=25%/>
-</p>
-
-__Target program__: outputs a synoptically correct SVG file that yields to the same visual output
+__Sample program__: outputs a synoptically correct SVG file that yields to the same visual output
 ```cpp
 #include <iostream>
-#include <animatepp.h>
+#include <animate.h>
 using namespace anipp;
 
 int main() {
-    Shape rect = svg.load("./sample.svg"); // load the xml file containing svg
-    cout << rect.x << "\n"; // read its x
-    cout << rect.width << "\n"; // read its width
-
-    // rotate_center is a high-level function that
-    // animates an objects by rotating it around the centroid
-    // (exact arguments TBD)
-    rect.animator.rotate_center();
-
-    rect.export("./output.svg"); // save to output.xml file
+    Rect r(20, 20, 100, 100, 3, 3);
+    r.attr({ {"fill", "red"},
+        {"stroke", "black"},
+        {"stroke-width", "5"}
+    });
+    Point center(70, 70);
+    r.animate.rotate(center, 0, center, 360)
+             .duration("10s")
+             .loop(true);
+    r.save("./output.svg");
 }
 ```
 
-__Exported SVG__: this is one of the frames. The resulting SVG will be the same square rotating with respect to its center indefinitely
+__Exported SVG__:
 ```xml
-<svg width="400" height="400" version="1.1" xmlns="http://www.w3.org/2000/svg">
-  <rect x="50" y="50" width="30" height="30" stroke="black" fill="red" stroke-width="1">
-      <animateTransform attributeName="transform"
-          attributeType="XML"
-          type="rotate"
-          from="0 65 65"
-          to="360 65 65"
-          dur="4s"
-          repeatCount="indefinite"/>
-  </rect>
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<rect x="20" y="20" rx="3" ry="3" width="100" height="100" fill="red" stroke="black" stroke-width="5">
+		<animateTransform
+            attributeName="transform"
+            type="rotate"
+            dur="10s"
+            from="0 70 70"
+            repeatCount="indefinite"
+            to="360 70 70" />
+	</rect>
 </svg>
 ```
 
+Click to show animation:
 <p align="center">
-    <img src="docs/progress-report/sample.svg" width=100%/>
+    <img src="examples/rect_rotate.svg" width=100%/>
 </p>
