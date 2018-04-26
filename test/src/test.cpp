@@ -191,6 +191,8 @@ int main() {
 
     // Simple shape tests
     test_square(OUTPUT("simple_rect.svg"));
+    test_circle(OUTPUT("simple_circle.svg"));
+    test_ellipse(OUTPUT("simple_ellipse.svg"));
     test_path(OUTPUT("simple_path.svg"));
     test_ellipse(OUTPUT("simple_ellipse.svg"));
     test_heart(OUTPUT("heart.svg"));
