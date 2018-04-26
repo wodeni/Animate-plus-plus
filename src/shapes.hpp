@@ -29,6 +29,7 @@ namespace anipp {
     ///////////////////////////////////////////////////////////////////////////
 
     typedef std::map<std::string, std::string> Attributes;
+    typedef std::map<std::string, Attributes> Elements;
     typedef std::map<std::string, std::set<std::string>> DefaultAttributes;
     typedef std::shared_ptr<Shape> ShapePtr;
     typedef std::vector<ShapePtr> ShapePtrList;
@@ -55,6 +56,7 @@ namespace anipp {
         SCALE,
         SKEWX,
         SKEWY,
+        MOVE,
         TRANSFORM,
         COMPOUND,
         CSS
@@ -64,6 +66,7 @@ namespace anipp {
     private:
         AnimationType _type;
         Attributes attributes;
+        Elements elements;
     public:
         std::string _name;                 // the name of the animation
         Animation& type(AnimationType);
@@ -75,7 +78,9 @@ namespace anipp {
         Animation& repeat(double);
         Animation& loop(bool);
         Animation& duration(std::string); // TODO: std::chrono::duration?
-        Animation& add(std::string);
+        Animation& custom_attribute(std::string, std::string);
+        Animation& add_element(std::string, Attributes);
+
         std::string toString();
         pugi::xml_node export_SVG(pugi::xml_document&);
     };
@@ -91,7 +96,7 @@ namespace anipp {
         Animation& translate(Point, Point, bool relative=false);
         Animation& rotate(Point, double, Point, double);
         Animation& scale(Point, Point);
-        Animation& move(Path &);
+        Animation& move_along(Path &);
         bool active();
 
         std::vector<pugi::xml_node> export_SVG(pugi::xml_document&);
@@ -107,8 +112,12 @@ namespace anipp {
     class Shape {
     private:
         Attributes attributes; // CSS styling attributes of the object
+        static int id_counter;
     public:
+        std::string id;
         Animator animate;      // The animator of a graphical primitive
+
+        Shape(std::string id) : id(id) {}
 
         virtual std::ostream& print(std::ostream& out) const = 0;
         virtual pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false) = 0;
@@ -121,6 +130,8 @@ namespace anipp {
 
         // print all attributes
         void print_attributes(std::ostream& out) const;
+        static int next_id() { return id_counter++; };
+        std::string get_id() { return id; };
 
         /**
          * load attributes from string into map
@@ -162,10 +173,10 @@ namespace anipp {
     private:
         ShapePtrList shapes;
     public:
-        Group();
-
         template<typename... Args>
-        Group(Args&&... args) {
+        Group(Args&&... args)
+            : Shape("group_" + std::to_string(next_id()))
+        {
             (this->shapes.push_back(args.clone()), ...);
         }
 

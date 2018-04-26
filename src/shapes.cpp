@@ -15,6 +15,8 @@ using namespace pugi;
 //     return attr;
 // }
 
+int Shape::id_counter = 0;
+
 xml_node anipp::Shape::add_animations(xml_document& doc, xml_node parent) {
     if(!animate.active()) return parent;
     vector<xml_node> anis = this->animate.export_SVG(doc);
@@ -49,6 +51,8 @@ void anipp::Shape::export_attributes(xml_node & node) {
         auto attr = node.append_attribute(key.c_str());
         attr.set_value(value.c_str());
     }
+    // BUG: maybe a better place?
+    node.append_attribute("id").set_value(this->id.c_str());
 }
 
 void anipp::Shape::print_attributes(ostream& out) const {
@@ -117,7 +121,8 @@ ShapePtr anipp::get_shape(pugi::xml_node node) {
  * Rectangle
  */
 Rect::Rect(double x, double y, double w, double h, double rx, double ry)
-    : x{x}
+    : Shape("rect_" + std::to_string(next_id()))
+    , x{x}
     , y{y}
     , width{w}
     , height{h}
@@ -126,7 +131,8 @@ Rect::Rect(double x, double y, double w, double h, double rx, double ry)
 { }
 
 Rect::Rect(const Rect& r)
-    : x{r.x}
+    : Shape("rect_" + std::to_string(next_id()))
+    , x{r.x}
     , y{r.y}
     , width{r.width}
     , height{r.height}
@@ -136,7 +142,9 @@ Rect::Rect(const Rect& r)
     cout << "rect copy constructor\n'";
 }
 
-Rect::Rect(xml_node& rect) {
+Rect::Rect(xml_node& rect)
+    : Shape("rect_" + std::to_string(next_id()))
+{
     this->x      = stod(rect.attribute("x").value());
     this->y      = stod(rect.attribute("y").value());
     this->width  = stod(rect.attribute("width").value());
@@ -196,12 +204,15 @@ ostream& Rect::print(ostream& out) const {
  * Circle
  */
 Circle::Circle(double cx, double cy, double r)
-    : cx{cx}
+    : Shape("circle_" + std::to_string(next_id()))
+    , cx{cx}
     , cy{cy}
     , r{r}
 { }
 
-Circle::Circle(xml_node& circle) {
+Circle::Circle(xml_node& circle)
+    : Shape("circle_" + std::to_string(next_id()))
+{
     this->cx = stod(circle.attribute("cx").value());
     this->cy = stod(circle.attribute("cy").value());
     this->r  = stod(circle.attribute("r").value());
@@ -234,13 +245,16 @@ ostream& Circle::print(ostream& out) const {
  * Ellipse
  */
 Ellipse::Ellipse(double cx, double cy, double rx, double ry)
-        : cx{cx}
-        , cy{cy}
-        , rx{rx}
-        , ry{ry}
+    : Shape("ellipse_" + std::to_string(next_id()))
+    , cx{cx}
+    , cy{cy}
+    , rx{rx}
+    , ry{ry}
 { }
 
-Ellipse::Ellipse(xml_node& ellipse) {
+Ellipse::Ellipse(xml_node& ellipse)
+    : Shape("ellipse_" + std::to_string(next_id()))
+{
     this->cx = stod(ellipse.attribute("cx").value());
     this->cy = stod(ellipse.attribute("cy").value());
     this->rx = stod(ellipse.attribute("rx").value());
@@ -277,13 +291,16 @@ ostream& Ellipse::print(ostream& out) const {
  * Line
  */
 Line::Line(double x1, double y1, double x2, double y2)
-        : x1{x1}
-        , y1{y1}
-        , x2{x2}
-        , y2{y2}
+    : Shape("line_" + std::to_string(next_id()))
+    , x1{x1}
+    , y1{y1}
+    , x2{x2}
+    , y2{y2}
 { }
 
-Line::Line(xml_node& line) {
+Line::Line(xml_node& line)
+    : Shape("line_" + std::to_string(next_id()))
+{
     this->x1 = stod(line.attribute("x1").value());
     this->y1 = stod(line.attribute("y1").value());
     this->x2 = stod(line.attribute("x2").value());
@@ -321,10 +338,13 @@ ostream& Line::print(ostream& out) const {
  * Polyline
  */
 Polyline::Polyline(vector<Point> & points)
-        : points(points)
+    : Shape("polyline_" + std::to_string(next_id()))
+    , points(points)
 { }
 
-Polyline::Polyline(xml_node& polyline) {
+Polyline::Polyline(xml_node& polyline)
+    : Shape("polyline_" + std::to_string(next_id()))
+{
     this->points = parser::parse_points(polyline.attribute("points").value());
     this->load_attributes(polyline, "polyline");
 }
@@ -349,10 +369,13 @@ ostream& Polyline::print(ostream& out) const {
  * Polygon
  */
 Polygon::Polygon(vector<Point> & points)
-        : points(points)
+    : Shape("polygon_" + std::to_string(next_id()))
+    , points(points)
 { }
 
-Polygon::Polygon(xml_node& polygon) {
+Polygon::Polygon(xml_node& polygon)
+    : Shape("polygon_" + std::to_string(next_id()))
+{
     this->points = parser::parse_points(polygon.attribute("points").value());
     this->load_attributes(polygon, "polygon");
 }
@@ -377,14 +400,19 @@ ostream& Polygon::print(ostream& out) const {
  * Path
  */
 
-Path::Path() {
-}
+Path::Path()
+    : Shape("path_" + std::to_string(next_id()))
+{ }
 
-Path::Path(string path_string) {
+Path::Path(string path_string)
+    : Shape("path_" + std::to_string(next_id()))
+{
     this->cmds = parser::parse(path_string);
 }
 
-Path::Path(xml_node& path) {
+Path::Path(xml_node& path)
+    : Shape("path_" + std::to_string(next_id()))
+{
     string d      = path.attribute("d").value();
     this->cmds = parser::parse(d);
     this->load_attributes(path, "path");
@@ -461,17 +489,22 @@ string Path::path_string() const {
 
 
 Group::Group(ShapePtrList& shapes)
-    : shapes(shapes)
+    : Shape("group_" + std::to_string(next_id()))
+    , shapes(shapes)
 {}
 
-Group::Group(ShapeList& shapes) {
+Group::Group(ShapeList& shapes)
+    : Shape("group_" + std::to_string(next_id()))
+{
     // BUG: no memory guarantees
     for(auto &s : shapes) {
         this->shapes.push_back(s.clone());
     }
 }
 
-Group::Group(xml_node& group) {
+Group::Group(xml_node& group)
+    : Shape("group_" + std::to_string(next_id()))
+{
     for(auto child : group.children()) {
         // cout << "Beginning with: ";
         // child.print(cout);
@@ -581,6 +614,16 @@ Animation& Animator::scale(Point from_scale, Point to_scale) {
     return animations.back();
 }
 
+Animation& Animator::move_along(Path& path) {
+    Animation ani;
+    Attributes a;
+    a["xlink:href"] = "#" + path.id;
+    ani.type(MOVE)
+       .add_element("mpath", a);
+    animations.push_back(ani);
+    return animations.back();
+}
+
 // void Animator::loop(bool isLooping) { this->_loop = isLooping; }
 
 string Animator::toString() {
@@ -651,6 +694,14 @@ Animation& Animation::loop(bool isLooping) {
     this->attributes["repeatCount"] = "indefinite";
     return *this;
 }
+Animation& Animation::custom_attribute(string key, string val) {
+    this->attributes[key] = val;
+    return *this;
+}
+Animation& Animation::add_element(string name, Attributes a) {
+    this->elements[name] = a;
+    return *this;
+}
 
 pugi::xml_node Animation::export_SVG(pugi::xml_document& doc) {
 
@@ -663,6 +714,10 @@ pugi::xml_node Animation::export_SVG(pugi::xml_document& doc) {
         ani_node.append_attribute("attributeName").set_value("transform");
         ani_node.append_attribute("type").set_value(this->_name.c_str());
     }
+    else if(this->_type == MOVE) {
+        node_name = "animateMotion";
+        ani_node = doc.append_child(node_name.c_str());
+    }
 
     // custom attributes
     for(auto it=this->attributes.begin(); it!=this->attributes.end(); ++it) {
@@ -670,6 +725,16 @@ pugi::xml_node Animation::export_SVG(pugi::xml_document& doc) {
         auto value = it->second;
         auto attr = ani_node.append_attribute(key.c_str());
         attr.set_value(value.c_str());
+    }
+
+    // if there is any child node of an animation, add them.
+    if(!elements.empty()) {
+        for(auto element : this->elements) {
+            auto child = ani_node.append_child(element.first.c_str());
+            for(auto a : element.second)
+                child.append_attribute(a.first.c_str())
+                     .set_value(a.second.c_str());
+        }
     }
 
     return ani_node;

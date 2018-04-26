@@ -149,6 +149,9 @@ void test_motion(string out_path) {
     end_point2.attr("fill", "lightgrey");
     Circle ball(0, 0, 5);
     ball.attr("fill", "red");
+    ball.animate.move_along(p)
+                .duration("6s")
+                .loop(true);
 
     Group g(p, end_point1, end_point2, ball);
     g.save(out_path);
