@@ -138,7 +138,7 @@ void test_heart(string out_path) {
      .arcTo(70, 70, -45, 0, 1, 100, -100, true)
      .arcTo(70, 70, 45, 0, 1, 100, 100, true)
      .cubicCurveTo(-50, 50, -75, 50, -100, 130, true);
-    p.animate.blink("2s");
+    p.animate.blink(2);
     p.attr("fill", "DeepPink");
     p.save(out_path);
 }
@@ -248,7 +248,7 @@ int main() {
 
     // Simple shape tests
     test_square(OUTPUT("simple_rect.svg"));
-    test_circle(OUTPUT("simple_circle.svg"));
+    // test_circle(OUTPUT("simple_circle.svg"));
     test_ellipse(OUTPUT("simple_ellipse.svg"));
     test_path(OUTPUT("simple_path.svg"));
     test_ellipse(OUTPUT("simple_ellipse.svg"));
