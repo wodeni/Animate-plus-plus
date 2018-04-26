@@ -2,6 +2,8 @@
 
 ## Test suite
 
+TODO
+
 - design
     - unit test of visual output
 - visual output
@@ -12,5 +14,4 @@
 - performance
     - JS vs. anipp
       - Time duration to load in tiger in anipp is 0.1413 second.
-      - 
-    - compare: https://github.com/svgpp/svgpp
+      - It is in fact incomparable between JS and Animated++, for JS uploading and downloading are both through network. 

@@ -94,6 +94,67 @@ __Xuanyuan Zhang - xz2580@columbia.edu__
 	string d="M20,230 Q40,205 50,230 T90,230";
 	Path p(d);
 	```
+- There are some more useful functions to edit our path.
+##### moveTo()
+- move the path to a certain position without drawing.
+- Taking three parameters in sequence.
+  - double: x (destination position on x-axis)
+  - double: y (destination position on y-axis)
+  - bool: relative (whether move in relative form or absolute form)
+```cpp
+p.moveTo(x, y, relative);
+```
+##### lineTo()
+- move the path to a certain position drawing a straight line.
+- Taking three parameters in sequence.
+  - double: x (destination position on x-axis)
+  - double: y (destination position on y-axis)
+  - bool: relative (whether move in relative form or absolute form)
+```cpp
+p.lineTo(x, y, relative);
+```
+##### quadraticCurveTo()
+- move the path to a position following a quadratic curve.
+- Taking five parameters in sequence.
+  - double: cpx (control point position on x-axis)
+  - double: cpy (control point position on y-axis)
+    -  for more information about control points, <a href="https://math.stackexchange.com/questions/2388032/finding-the-control-points-of-a-quadratic-b%C3%A9zier-curve">click here</a>
+  - double: x (destination position on x-axis)
+  - double: y (destination position on y-axis)
+  - bool: relative (whether move in relative form or absolute form)
+```cpp
+p.quadraticCurveTo(cpx, cpy, x, y, relative);
+```
+##### arcTo()
+- move the path to a position following a arc, which can be treated as a smoother curve.
+bool relative
+- Taking eight parameters in sequence.
+  - double: rx (radius on x-axis)
+  - double: ry (radius on y-axis)
+  - double: x_axis_rotation (how much is the angle tilted)
+  - double: large_arc_flag
+  - double: sweep_flag
+  - double: x (destination position on x-axis)
+  - double: y (destination position on y-axis)
+  - bool: relative (whether move in relative form or absolute form)
+  The image in below explains what's <span style="color:red">large_arc_flag</span> and what's <span style="color:red">sweep_flag</span>
+![](../assets/final-report/SVGArcs_Flags.png)
+```cpp
+p.arcTo(rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, x, y, relative);
+```
+##### cubicCurveTo()
+Also known as bezier curve, which is the real soul of SVG!
+- Taking seven parameters in sequence.
+  - double: cp1x (control point 1 on x-axis)
+  - double: cp1y (control point 1 on y-axis)
+  - double: cp2x (control point 2 on x-axis)
+  - double: cp2y (control point 2 on y-axis)
+  - double: x (destination position on x-axis)
+  - double: y (destination position on y-axis)
+  - bool: relative (whether move in relative form or absolute form)
+```cpp
+p.cubicCurveTo(cp1x, cp1y, cp2x, cp2y, x, y, relative);
+```
 
 ## Set external properties
 Other than basic properties of each shape, there are more external properties, including color, stroke, etc. Animate++ supports easy ways for users to add properties.
@@ -114,7 +175,7 @@ This is a rectangle with three external properties, stroke, fill and stroke-widt
 ```cpp
 r.attr({
 		{"stroke", "black"},
-		{"fill", "transparent"},
+		{"fill", "red"},
 		{"stroke-width", "5"},
 });
 ```
@@ -125,7 +186,19 @@ After setting up attributes, that's how it looks like.
 	</rect>
 </svg>
 
+We can simply modify the attributes to overwrite existing ones. For example:
+```cpp
+r.attr({
+		{"stroke", "black"},
+		{"fill", "red"}
+});
+// now we reset fill color to yellow.
+r.attr("fill", "yellow");
+// Using same logic, we can delete existing attribute simply by setting it to empty string
+r.attr("stroke", "");
+```
 ## Complex shapes
+TODO (What else should we say about complex shape)
 Of course, supporting only single type of object is not sufficient to accomplish all fancy functionalities that can potentially be achieved by SVGs. Animate++ also supports multiple shapes contained in one single file to be loaded all together.
 ```cpp
 // load in svg from a path, which is a string of local file directory
@@ -214,4 +287,69 @@ c.animate.scale(Point(0, 0), Point(1, 1)) // from="0 0" to="1 1"
 	<circle cx="100" cy="100" r="100" fill="aqua" opacity="0.5">
 		<animateTransform attributeName="transform" type="scale" dur="2.5s" from="0 0" repeatCount="indefinite" to="1 1" />
 	</circle>
+</svg>
+
+### Move_along
+In move_along, user asks the animate object of any shape to take an input from a Path object. The object will then have a motion along the path being created. An example in below shows how we can generate complicated SVG file using straightforward c++ code:
+
+SVG file that generated from our c++ code.
+
+`<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="group_1805">
+	<path d="M 10 110 A 120 120 -45 0 1 110 10 A 120 120 -45 0 1 10 110 " fill="none" stroke="lightgrey" stroke-width="2" id="path_1801" />
+	<circle cx="10" cy="110" r="3" fill="lightgrey" id="circle_1802" />
+	<circle cx="110" cy="10" r="3" fill="lightgrey" id="circle_1803" />
+	<circle cx="0" cy="0" r="5" fill="red" id="circle_1804">
+		<animateMotion dur="6s" repeatCount="indefinite">
+			<mpath xlink:href="#path_1801" />
+		</animateMotion>
+	</circle>
+</g>
+</svg>`
+
+Our cpp code that generates the SVG above.
+
+```cpp
+// Define path that we will travel.
+Path p;
+p.moveTo(10, 110)
+ .arcTo(120, 120, -45, 0, 1, 110, 10)
+ .arcTo(120, 120, -45, 0, 1, 10,  110);
+p.attr({
+    {"stroke", "lightgrey"},
+    {"stroke-width", "2"},
+    {"fill", "none"},
+});
+// Create end point 1 on bottom left corner
+Circle end_point1(10, 110, 3);
+end_point1.attr("fill", "lightgrey");
+// Create end point 2 on top right corner
+Circle end_point2(110, 10, 3);
+end_point2.attr("fill", "lightgrey");
+// Create our red ball moving along the path
+Circle ball(0, 0, 5);
+ball.attr("fill", "red");
+ball.animate.move_along(p)
+            .duration("6s")
+            .loop(true);
+
+Group g(p, end_point1, end_point2, ball);
+g.save(out_path);
+```
+
+Here comes the result.
+
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="group_1805">
+	<path d="M 10 110 A 120 120 -45 0 1 110 10 A 120 120 -45 0 1 10 110 " fill="none" stroke="lightgrey" stroke-width="2" id="path_1801" />
+	<circle cx="10" cy="110" r="3" fill="lightgrey" id="circle_1802" />
+	<circle cx="110" cy="10" r="3" fill="lightgrey" id="circle_1803" />
+	<circle cx="0" cy="0" r="5" fill="red" id="circle_1804">
+		<animateMotion dur="6s" repeatCount="indefinite">
+			<mpath xlink:href="#path_1801" />
+		</animateMotion>
+	</circle>
+</g>
 </svg>

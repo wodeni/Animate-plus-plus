@@ -24,7 +24,7 @@
 
 ### 0.8 Version all clear
 - XML parsing under the support of pugi library
-- SVG loader supports all common shapes individually including 
+- SVG loader supports all common shapes individually including
     - Rectangle
     - Circle
     - Ellipse
@@ -32,7 +32,7 @@
     - Polyline
     - Path
     - Bezier curve
-- Compound shape with any number of individual objects can also be loaded 
+- Compound shape with any number of individual objects can also be loaded
 (a code snippet of how we load any type of shape is shown in below).
 ```cpp
 // load SVG
@@ -57,7 +57,7 @@ g->save(out_path);
 </svg>
 ```
 - Basic animations including rotation, scaling and translation of all basic objects have been accomplished. Users
-are free to manipulate the existing objects in their ways of favor. (An example of how we edit our circle animation 
+are free to manipulate the existing objects in their ways of favor. (An example of how we edit our circle animation
 is shown by the c++ code snippet in below)
 
 Here is the SVG before editing
@@ -78,7 +78,7 @@ The SVG after editing
 </circle>
 ```
 
-#### 1.0 all clear
+#### 1.0 Version All clear
 - Fonts, fills and strokes are all completed(shown in the code snippet in below)
 ```cpp
 Circle c(100, 100, 100);
@@ -91,10 +91,7 @@ c.attr({
 - Complicated animation has also been accomplished. In the example given below, we load a tiger SVG as a combination of more than 200 beizer curves with over 700 lines of code. The whole tiger head can rotate and translate.
 
 ![tiger](../assets/final-report/tiger.png)
+- Path class completed. Can now modify all different kinds of paths including line, quadratic curve, bezier curve and arc.
 
-#### 1.2 pending
-
-
-
-
-
+#### 1.2 Version Something done.
+- Motions along all different types of paths are available.
