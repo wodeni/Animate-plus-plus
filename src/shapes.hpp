@@ -90,6 +90,7 @@ namespace anipp {
         Animation& translate(Point, Point, bool relative=false);
         Animation& rotate(Point, double, Point, double);
         Animation& scale(Point, Point);
+        Animation& move(Path &);
         bool active();
 
         std::vector<pugi::xml_node> export_SVG(pugi::xml_document&);
@@ -111,6 +112,8 @@ namespace anipp {
         virtual std::ostream& print(std::ostream& out) const = 0;
         virtual pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false) = 0;
         Attributes get_attributes() const { return this->attributes; }
+        // virtual ShapePtr clone() const = 0;
+        virtual Shape* clone() const;
 
         // print all attributes
         void print_attributes(std::ostream& out) const;
@@ -157,7 +160,9 @@ namespace anipp {
     public:
         Group();
         Group(ShapeList&);
+        Group(std::vector<Shape> shapes);
         Group(pugi::xml_node&); // import SVG
+        Group* clone() const { return new Group(*this); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -265,17 +270,19 @@ namespace anipp {
         // PathDescription d;
         Commands cmds;
     public:
+        Path();
         Path(std::string);
         Path(pugi::xml_node&); // import SVG
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
+        std::string path_string() const;
         // functions to construct a path
         Path& closePath();
         Path& moveTo(double x, double y, bool relative=false);
         Path& lineTo(double x, double y, bool relative=false);
         Path& quadraticCurveTo(double cpx, double cpy, double x, double y, bool relative=false);
         Path& bezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y,  double x, double y, bool relative=false);
-        Path& arcTo(double x1, double y1, double x2, double y2, double radius, bool relative=false);
+        Path& arcTo(double rx, double ry, double x_axis_rotation, double large_arc_flag, double sweep_flag, double x, double y, bool relative=false);
     };
 
     ///////////////////////////////////////////////////////////////////////////

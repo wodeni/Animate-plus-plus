@@ -376,6 +376,10 @@ ostream& Polygon::print(ostream& out) const {
 /*
  * Path
  */
+
+Path::Path() {
+}
+
 Path::Path(string path_string) {
     this->cmds = parser::parse(path_string);
 }
@@ -431,10 +435,11 @@ Path& Path::bezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y,  d
     this->cmds.push_back(c);
     return *this;
 }
-Path& Path::arcTo(double x1, double y1, double x2, double y2, double radius, bool relative) {
+
+Path& Path::arcTo(double rx, double ry, double x_axis_rotation, double large_arc_flag, double sweep_flag, double x, double y, bool relative) {
     Command c = {
         ELLIPTICAL, get_type_char(ELLIPTICAL, relative),
-        relative ? RELATIVE : ABSOLUTE, {x1, y1, x2, y2, radius}
+        relative ? RELATIVE : ABSOLUTE, {rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, x, y}
     };
     this->cmds.push_back(c);
     return *this;
@@ -446,13 +451,26 @@ ostream& Path::print(ostream& out) const {
     return out;
 }
 
+string Path::path_string() const {
+    return toString(this->cmds);
+}
+
 /*
  * Shape Group
  */
 
+
 Group::Group(ShapeList& shapes)
     : shapes(shapes)
 {}
+
+Group::Group(vector<Shape> shapes) {
+    // BUG: no memory guarantees
+    for(auto &s : shapes) {
+        // ShapePtr sp = s.clone();
+        this->shapes.push_back(sp);
+    }
+}
 
 Group::Group(xml_node& group) {
     for(auto child : group.children()) {
