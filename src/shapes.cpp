@@ -460,15 +460,14 @@ string Path::path_string() const {
  */
 
 
-Group::Group(ShapeList& shapes)
+Group::Group(ShapePtrList& shapes)
     : shapes(shapes)
 {}
 
-Group::Group(vector<Shape> shapes) {
+Group::Group(ShapeList& shapes) {
     // BUG: no memory guarantees
     for(auto &s : shapes) {
-        // ShapePtr sp = s.clone();
-        this->shapes.push_back(sp);
+        this->shapes.push_back(s.clone());
     }
 }
 
@@ -485,6 +484,17 @@ Group::Group(xml_node& group) {
     }
     this->load_attributes(group, "group");
 }
+
+// template <class T, class... T2>
+// Group::Group(T s, T2... rest) : Group(rest...) {
+//     this->shapes.insert(this->shapes.begin(), s.clone());
+// }
+
+
+// void Group::add(Shape& s, ...) {
+//
+// }
+
 
 xml_node Group::export_SVG(xml_document& doc, bool standalone) {
     auto group = doc.append_child("g");
@@ -513,7 +523,7 @@ ShapePtr anipp::load(string filename) {
     xml_parse_result result = doc_in.load_file(filename.c_str());
     if (!result)
         die("Failed to load SVG file: " + filename);
-    ShapeList shapes;
+    ShapePtrList shapes;
     for(auto child : doc_in.child("svg")) {
         auto shp = get_shape(child);
         shapes.push_back(shp);

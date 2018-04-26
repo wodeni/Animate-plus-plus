@@ -31,7 +31,8 @@ namespace anipp {
     typedef std::map<std::string, std::string> Attributes;
     typedef std::map<std::string, std::set<std::string>> DefaultAttributes;
     typedef std::shared_ptr<Shape> ShapePtr;
-    typedef std::vector<ShapePtr> ShapeList;
+    typedef std::vector<ShapePtr> ShapePtrList;
+    typedef std::vector<Shape> ShapeList;
 
     /*
      * A table contains key value pair of shape and necessary attributes
@@ -112,8 +113,11 @@ namespace anipp {
         virtual std::ostream& print(std::ostream& out) const = 0;
         virtual pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false) = 0;
         Attributes get_attributes() const { return this->attributes; }
-        // virtual ShapePtr clone() const = 0;
-        virtual Shape* clone() const;
+
+        // Factory idiom: virtual constructors for Shape
+        // (https://cpppatterns.com/patterns/virtual-constructor.html)
+        virtual ShapePtr clone() const = 0;
+        // virtual Shape* create() const = 0;
 
         // print all attributes
         void print_attributes(std::ostream& out) const;
@@ -156,13 +160,20 @@ namespace anipp {
      */
     class Group : public Shape {
     private:
-        ShapeList shapes;
+        ShapePtrList shapes;
     public:
         Group();
+
+        template<typename... Args>
+        Group(Args&&... args) {
+            (this->shapes.push_back(args.clone()), ...);
+        }
+
+        Group(ShapePtrList&);
         Group(ShapeList&);
-        Group(std::vector<Shape> shapes);
         Group(pugi::xml_node&); // import SVG
-        Group* clone() const { return new Group(*this); };
+        // void add(Shape& s, ...);
+        ShapePtr clone() const { return ShapePtr(new Group(*this)); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -178,6 +189,7 @@ namespace anipp {
     public:
         Circle(double, double, double);
         Circle(pugi::xml_node&); // import SVG
+        ShapePtr clone() const { return ShapePtr(new Circle(*this)); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -198,6 +210,7 @@ namespace anipp {
         Rect(pugi::xml_node&); // import SVG
         Rect(const Rect&); // copy constructor
         // ~Rect() {} // TODO: destructor needed?
+        ShapePtr clone() const { return ShapePtr(new Rect(*this)); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         virtual std::ostream& print(std::ostream& out) const;
         void load_corners(std::string, std::string);
@@ -215,6 +228,7 @@ namespace anipp {
     public:
         Ellipse(double, double, double, double);
         Ellipse(pugi::xml_node&); // import SVG
+        ShapePtr clone() const { return ShapePtr(new Ellipse(*this)); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -231,6 +245,7 @@ namespace anipp {
     public:
         Line(double, double, double, double);
         Line(pugi::xml_node&); // import SVG
+        ShapePtr clone() const { return ShapePtr(new Line(*this)); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -244,6 +259,7 @@ namespace anipp {
     public:
         Polyline(std::vector<Point> &);
         Polyline(pugi::xml_node&); // import SVG
+        ShapePtr clone() const { return ShapePtr(new Polyline(*this)); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -257,6 +273,7 @@ namespace anipp {
     public:
         Polygon(std::vector<Point> &);
         Polygon(pugi::xml_node&); // import SVG
+        ShapePtr clone() const { return ShapePtr(new Polygon(*this)); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
     };
@@ -273,6 +290,7 @@ namespace anipp {
         Path();
         Path(std::string);
         Path(pugi::xml_node&); // import SVG
+        ShapePtr clone() const { return ShapePtr(new Path(*this)); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         std::ostream& print(std::ostream& out) const;
         std::string path_string() const;
@@ -290,11 +308,17 @@ namespace anipp {
 
     // Based on the name of a node, call appropriate constructor and return
     // corresponding shape object (e.g.: "circle" -> Circle object)
+    // NOTE: this is a factory function
     ShapePtr get_shape(pugi::xml_node node);
 
     // Load from an SVG file
     ShapePtr load(std::string);
 
+    template<typename... Args>
+    void print_shapes(Args&&... args) {
+        // (std::cout << ... << args) << '\n';
+        (args.print(std::cout),  ...) << '\n';
+    }
 }
 
 // A wrapper function that allows `cout << shape` kind of syntax

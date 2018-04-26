@@ -120,6 +120,40 @@ void test_ani_rotate(string out_path) {
     r.save(out_path);
 }
 
+void test_path(string out_path) {
+    Path p;
+    p.moveTo(10, 110)
+     .arcTo(120, 120, -45, 0, 1, 110, 10)
+     .arcTo(120, 120, -45, 0, 1, 10,  110);
+    p.attr({
+        {"stroke", "lightgrey"},
+        {"stroke-width", "2"},
+        {"fill", "none"},
+    });
+    p.save(out_path);
+}
+
+void test_motion(string out_path) {
+    Path p;
+    p.moveTo(10, 110)
+     .arcTo(120, 120, -45, 0, 1, 110, 10)
+     .arcTo(120, 120, -45, 0, 1, 10,  110);
+    p.attr({
+        {"stroke", "lightgrey"},
+        {"stroke-width", "2"},
+        {"fill", "none"},
+    });
+    Circle end_point1(10, 110, 3);
+    end_point1.attr("fill", "lightgrey");
+    Circle end_point2(110, 10, 3);
+    end_point2.attr("fill", "lightgrey");
+    Circle ball(0, 0, 5);
+    ball.attr("fill", "red");
+
+    Group g(p, end_point1, end_point2, ball);
+    g.save(out_path);
+}
+
 int main() {
     // I/O tests
     test_group("test/svgs/sample.svg", "test/output/sample_out.svg");
@@ -131,6 +165,7 @@ int main() {
 
     // Simple shape tests
     test_square(OUTPUT("simple_rect.svg"));
+    test_path(OUTPUT("simple_path.svg"));
 
     // Elementary animation tests
     test_ani_rotate(OUTPUT("rect_rotate.svg"));
@@ -138,6 +173,8 @@ int main() {
     test_ani_scale(OUTPUT("circle_scale.svg"));
     test_ani_translate_abs(OUTPUT("circle_translate_abs.svg"));
     test_ani_translate_rel(OUTPUT("circle_translate_rel.svg"));
+    test_motion(OUTPUT("bezier_motion.svg"));
+
 
     // separate test for SVG path parser
     std::string path = "M3,7 5-6 L1,7 1e2-.4 m-10,10 l10,0       "
