@@ -157,6 +157,63 @@ void test_motion(string out_path) {
     g.save(out_path);
 }
 
+void test_motion_group(string in_path, string out_path) {
+    Path p;
+    p.moveTo(10, 110)
+     .arcTo(120, 120, -45, 0, 1, 110, 10)
+     .arcTo(120, 120, -45, 0, 1, 10,  110);
+    p.attr("visibility", "hidden");
+    ShapePtr tiger = load(in_path);
+    tiger->animate.translate(Point(0, 0), Point(300, 0), true)
+                  .begin("0s")
+                  .duration("3s");
+    tiger->animate.move_along(p)
+                  .begin("3s")
+                  .duration("6s")
+                  .loop(true);
+    Group g(p, *tiger);
+    g.save(out_path);
+}
+
+void test_blink(string out_path) {
+    Circle c(100, 100, 20);
+    c.attr({
+        {"fill", "red"},
+        {"stroke", "black"},
+        {"stroke-width", "3"},
+    });
+    c.animate.blink(0.5);
+    c.save(out_path);
+}
+
+void test_blink_group(string in_path, string out_path) {
+    ShapePtr g = load(in_path);
+    g->animate.blink(3);
+    g->save(out_path);
+}
+
+void test_satellite(string out_path) {
+    Circle globe(80, 80, 50);
+    Path satellite, half_globe;
+    satellite.moveTo(0, 70)
+             .arcTo(65, 70, 0, 0, 0, 65, 0)
+             .arcTo(5, 5, 0, 0, 1, 75, 0)
+             .arcTo(75, 70, 0, 0, 1, 0, 70)
+             .closePath();
+    satellite.attr("fill", "#FFF");
+    satellite.animate.rotate(Point(0, 0), 360, Point(0, 0), 0)
+                     .duration("1s")
+                     .loop(true);
+    half_globe.moveTo(50, 0)
+              .arcTo(50, 50, 0, 0, 0, -50, 0)
+              .closePath();
+    // satellite.transfrom.matrix(0.866, -0.5, 0.25, 0.433, 80, 80);
+    // half_globe.transfrom.matrix(0.866, -0.5, 0.5, 0.866, 80, 80);
+
+    Group g(globe, half_globe, satellite);
+    g.save(out_path);
+}
+
 int main() {
     // I/O tests
     test_group("test/svgs/sample.svg", "test/output/sample_out.svg");
@@ -177,6 +234,12 @@ int main() {
     test_ani_translate_abs(OUTPUT("circle_translate_abs.svg"));
     test_ani_translate_rel(OUTPUT("circle_translate_rel.svg"));
     test_motion(OUTPUT("bezier_motion.svg"));
+    test_motion_group("test/svgs/tiger.svg", OUTPUT("bezier_motion_tiger.svg"));
+
+    // compound animation tests
+    test_blink(OUTPUT("blink.svg"));
+    test_blink_group("test/svgs/tiger.svg", OUTPUT("blink_group.svg"));
+    test_satellite(OUTPUT("satellite.svg"));
 
 
     // separate test for SVG path parser
