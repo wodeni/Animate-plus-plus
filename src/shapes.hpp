@@ -113,19 +113,19 @@ namespace anipp {
     };
 
 
-    class Transform {
-    private:
-        Matrix matrix;
-    public:
-        Transform& translate(Point);
-        Transform& rotate(Point);
-        Transform& scale(Point);
-        Transform& matrix(double, double, double, double, double, double);
-        std::string toString();
-    }
+    // class Transform {
+    // private:
+    //     Matrix matrix;
+    // public:
+    //     Transform& translate(Point);
+    //     Transform& rotate(Point);
+    //     Transform& scale(Point);
+    //     Transform& matrix(double, double, double, double, double, double);
+    //     std::string toString();
+    // }
 
-    Animation& translate(Animator& anim, Point from, Point to);
-    Animation& rotate(Animator& anim, Point from, Point to);
+    // Animation& translate(Animator& anim, Point from, Point to);
+    // Animation& rotate(Animator& anim, Point from, Point to);
 
     /*
      * Top level abstract class for all shapes

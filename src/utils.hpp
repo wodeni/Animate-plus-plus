@@ -82,18 +82,18 @@ namespace anipp {
     // template<typename Container>
     // void print_container(const Container&);
 
-    /**
-     * Matrix class represents a 3 by 3 matrix
-     */
-     class Matrix {
-     private:
-         double[3][3] mat;
-     public:
-         Matrix() : mat({{0}}) { }
-         Matrix& operator*=()
-
-     };
-
+    // /**
+    //  * Matrix class represents a 3 by 3 matrix
+    //  */
+    //  class Matrix {
+    //  private:
+    //      double[3][3] mat;
+    //  public:
+    //      Matrix() : mat({{0}}) { }
+    //      Matrix& operator*=()
+    //
+    //  };
+    // 
 
     /*
      * SVG helpers
