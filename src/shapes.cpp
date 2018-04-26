@@ -22,6 +22,7 @@ xml_node anipp::Shape::add_animations(xml_document& doc, xml_node parent) {
     vector<xml_node> anis = this->animate.export_SVG(doc);
     for(auto child : anis)
         parent.append_move(child);
+
     return parent;
 }
 
@@ -52,7 +53,8 @@ void anipp::Shape::export_attributes(xml_node & node) {
         attr.set_value(value.c_str());
     }
     // BUG: maybe a better place?
-    node.append_attribute("id").set_value(this->id.c_str());
+    if(id.size() != 0)
+        node.append_attribute("id").set_value(this->id.c_str());
 }
 
 void anipp::Shape::print_attributes(ostream& out) const {
@@ -143,7 +145,6 @@ Rect::Rect(const Rect& r)
 }
 
 Rect::Rect(xml_node& rect)
-    : Shape("rect_" + std::to_string(next_id()))
 {
     this->x      = stod(rect.attribute("x").value());
     this->y      = stod(rect.attribute("y").value());
@@ -211,7 +212,6 @@ Circle::Circle(double cx, double cy, double r)
 { }
 
 Circle::Circle(xml_node& circle)
-    : Shape("circle_" + std::to_string(next_id()))
 {
     this->cx = stod(circle.attribute("cx").value());
     this->cy = stod(circle.attribute("cy").value());
@@ -253,7 +253,6 @@ Ellipse::Ellipse(double cx, double cy, double rx, double ry)
 { }
 
 Ellipse::Ellipse(xml_node& ellipse)
-    : Shape("ellipse_" + std::to_string(next_id()))
 {
     this->cx = stod(ellipse.attribute("cx").value());
     this->cy = stod(ellipse.attribute("cy").value());
@@ -299,7 +298,6 @@ Line::Line(double x1, double y1, double x2, double y2)
 { }
 
 Line::Line(xml_node& line)
-    : Shape("line_" + std::to_string(next_id()))
 {
     this->x1 = stod(line.attribute("x1").value());
     this->y1 = stod(line.attribute("y1").value());
@@ -343,7 +341,6 @@ Polyline::Polyline(vector<Point> & points)
 { }
 
 Polyline::Polyline(xml_node& polyline)
-    : Shape("polyline_" + std::to_string(next_id()))
 {
     this->points = parser::parse_points(polyline.attribute("points").value());
     this->load_attributes(polyline, "polyline");
@@ -374,7 +371,6 @@ Polygon::Polygon(vector<Point> & points)
 { }
 
 Polygon::Polygon(xml_node& polygon)
-    : Shape("polygon_" + std::to_string(next_id()))
 {
     this->points = parser::parse_points(polygon.attribute("points").value());
     this->load_attributes(polygon, "polygon");
@@ -411,7 +407,6 @@ Path::Path(string path_string)
 }
 
 Path::Path(xml_node& path)
-    : Shape("path_" + std::to_string(next_id()))
 {
     string d      = path.attribute("d").value();
     this->cmds = parser::parse(d);
@@ -519,7 +514,6 @@ Group::Group(ShapeList& shapes)
 }
 
 Group::Group(xml_node& group)
-    : Shape("group_" + std::to_string(next_id()))
 {
     for(auto child : group.children()) {
         // cout << "Beginning with: ";
@@ -550,7 +544,8 @@ xml_node Group::export_SVG(xml_document& doc, bool standalone) {
     for(auto& shp : this->shapes) {
         // TODO: to be tested
         auto node = shp->export_SVG(doc);
-        group.append_move(this->add_animations(doc, node));
+        // group.append_move(this->add_animations(doc, node));
+        group.append_move(node);
     }
     this->export_attributes(group);
     return this->add_animations(doc, group);
@@ -640,6 +635,27 @@ Animation& Animator::move_along(Path& path) {
     return animations.back();
 }
 
+void Animator::blink(double duration) {
+    Animation ani1("blink1");
+    Animation ani2("blink2");
+    string dur = dtos(duration) + "s";
+    ani1.type(CSS)
+        .attribute("opacity")
+        .from("0")
+        .to("1")
+        .begin("0s")
+        .after("blink2")
+        .duration(dur);
+    ani2.type(CSS)
+        .attribute("opacity")
+        .from("1")
+        .to("0")
+        .after("blink1")
+        .duration(dur);
+    animations.push_back(ani1);
+    animations.push_back(ani2);
+}
+
 // void Animator::loop(bool isLooping) { this->_loop = isLooping; }
 
 string Animator::toString() {
@@ -673,6 +689,10 @@ string Animation::toString() {
     // return res;
 }
 
+Animation& Animation::id(string t) {
+    this->_id = t;
+    return *this;
+}
 Animation& Animation::type(AnimationType t) {
     this->_type = t;
     return *this;
@@ -686,6 +706,20 @@ Animation& Animation::attribute(string attr) {
     return *this;
 }
 
+Animation& Animation::after(string id, double time_after) {
+    string s = this->attributes["begin"];
+    s += id + ".end";
+    if(time_after != 0)
+        s += dtos(time_after);
+    this->attributes["begin"] = s + ";";
+    return *this;
+}
+Animation& Animation::begin(string t) {
+    string s = this->attributes["begin"];
+    s += t + ";";
+    this->attributes["begin"] = s;
+    return *this;
+}
 Animation& Animation::from(string t) {
     this->attributes["from"] = t;
     return *this;
@@ -734,6 +768,14 @@ pugi::xml_node Animation::export_SVG(pugi::xml_document& doc) {
         node_name = "animateMotion";
         ani_node = doc.append_child(node_name.c_str());
     }
+    else if(this->_type == CSS) {
+        node_name = "animate";
+        ani_node = doc.append_child(node_name.c_str());
+    }
+
+    // if there is an id, plug it in
+    if(this->_id.size() != 0)
+        ani_node.append_attribute("id").set_value(this->_id.c_str());
 
     // custom attributes
     for(auto it=this->attributes.begin(); it!=this->attributes.end(); ++it) {

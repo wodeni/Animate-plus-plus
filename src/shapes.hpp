@@ -69,6 +69,12 @@ namespace anipp {
         Elements elements;
     public:
         std::string _name;                 // the name of the animation
+        std::string _id;                 // the name of the animation
+
+        Animation() : _id("") {}
+        Animation(std::string id) : _id(id) {}
+
+        Animation& id(std::string);
         Animation& type(AnimationType);
         Animation& name(std::string);
         Animation& attribute(std::string);
@@ -77,6 +83,8 @@ namespace anipp {
         Animation& by(std::string);
         Animation& repeat(double);
         Animation& loop(bool);
+        Animation& begin(std::string);
+        Animation& after(std::string, double time_after=0);
         Animation& duration(std::string); // TODO: std::chrono::duration?
         Animation& custom_attribute(std::string, std::string);
         Animation& add_element(std::string, Attributes);
@@ -96,12 +104,25 @@ namespace anipp {
         Animation& translate(Point, Point, bool relative=false);
         Animation& rotate(Point, double, Point, double);
         Animation& scale(Point, Point);
+        void blink(double);
         Animation& move_along(Path &);
         bool active();
 
         std::vector<pugi::xml_node> export_SVG(pugi::xml_document&);
         std::string toString();
     };
+
+
+    // class Transform {
+    // private:
+    //     Matrix matrix;
+    // public:
+    //     Transform& translate(Point);
+    //     Transform& rotate(Point);
+    //     Transform& scale(Point);
+    //     Transform& matrix(double, double, double, double, double, double);
+    //     std::string toString();
+    // }
 
     // Animation& translate(Animator& anim, Point from, Point to);
     // Animation& rotate(Animator& anim, Point from, Point to);
@@ -116,7 +137,9 @@ namespace anipp {
     public:
         std::string id;
         Animator animate;      // The animator of a graphical primitive
+        // Transform transform;      // The animator of a graphical primitive
 
+        Shape() : id("") {}
         Shape(std::string id) : id(id) {}
 
         virtual std::ostream& print(std::ostream& out) const = 0;
