@@ -61,6 +61,17 @@ void test_square(string out_path) {
     r.save(out_path);
 }
 
+void test_ellipse(string out_path) {
+    Ellipse e(100, 50, 100, 50);
+    e.attr({
+        {"fill", "DarkGoldenrod"},
+        {"stroke", "black"},
+        {"stroke-width", "3"},
+        {"stroke-dasharray", "5, 5"}
+    });
+    e.save(out_path);
+}
+
 void test_ani_scale(string out_path) {
     Circle c(100, 100, 100);
     c.attr({
@@ -120,6 +131,18 @@ void test_ani_rotate(string out_path) {
     r.save(out_path);
 }
 
+void test_heart(string out_path) {
+    Path p;
+    p.moveTo(121, 251)
+     .cubicCurveTo(-25, -80, -50,-80, -100, -130, true)
+     .arcTo(70, 70, -45, 0, 1, 100, -100, true)
+     .arcTo(70, 70, 45, 0, 1, 100, 100, true)
+     .cubicCurveTo(-50, 50, -75, 50, -100, 130, true);
+    p.animate.blink("2s");
+    p.attr("fill", "DeepPink");
+    p.save(out_path);
+}
+
 void test_path(string out_path) {
     Path p;
     p.moveTo(10, 110)
@@ -169,6 +192,8 @@ int main() {
     // Simple shape tests
     test_square(OUTPUT("simple_rect.svg"));
     test_path(OUTPUT("simple_path.svg"));
+    test_ellipse(OUTPUT("simple_ellipse.svg"));
+    test_heart(OUTPUT("heart.svg"));
 
     // Elementary animation tests
     test_ani_rotate(OUTPUT("rect_rotate.svg"));

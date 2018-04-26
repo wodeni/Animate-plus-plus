@@ -447,6 +447,14 @@ Path& Path::lineTo(double x, double y, bool relative) {
     this->cmds.push_back(c);
     return *this;
 }
+Path& Path::quadraticCurveTo(double x, double y, bool relative) {
+    Command c = {
+        QUDRATIC, get_type_char(SMOOTH_QUDRATIC, relative),
+        relative ? RELATIVE : ABSOLUTE, {x, y}
+    };
+    this->cmds.push_back(c);
+    return *this;
+}
 Path& Path::quadraticCurveTo(double cpx, double cpy, double x, double y, bool relative) {
     Command c = {
         SMOOTH_QUDRATIC, get_type_char(SMOOTH_QUDRATIC, relative),
@@ -455,10 +463,18 @@ Path& Path::quadraticCurveTo(double cpx, double cpy, double x, double y, bool re
     this->cmds.push_back(c);
     return *this;
 }
-Path& Path::bezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y,  double x, double y, bool relative) {
+Path& Path::cubicCurveTo(double cp1x, double cp1y, double cp2x, double cp2y,  double x, double y, bool relative) {
     Command c = {
-        SMOOTH_CUBIC, get_type_char(SMOOTH_CUBIC, relative),
+        CUBIC, get_type_char(CUBIC, relative),
         relative ? RELATIVE : ABSOLUTE, {cp1x, cp1y, cp2x, cp2y, x, y}
+    };
+    this->cmds.push_back(c);
+    return *this;
+}
+Path& Path::cubicCurveTo(double cp2x, double cp2y,  double x, double y, bool relative) {
+    Command c = {
+        CUBIC, get_type_char(SMOOTH_CUBIC, relative),
+        relative ? RELATIVE : ABSOLUTE, {cp2x, cp2y, x, y}
     };
     this->cmds.push_back(c);
     return *this;

@@ -3,7 +3,7 @@
      viewBox="0 0 700 400">
 
   <path id="hood"
-        fill="none" stroke="black" stroke-width="1"
+        fill="none" stroke="white" stroke-width="1"
         stroke-dashoffset="1000" stroke-dasharray="1000"
         d="M 159.00,114.00
            C 160.00,114.00 172.00,107.00 173.00,107.00

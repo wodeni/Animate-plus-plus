@@ -310,7 +310,9 @@ namespace anipp {
         Path& moveTo(double x, double y, bool relative=false);
         Path& lineTo(double x, double y, bool relative=false);
         Path& quadraticCurveTo(double cpx, double cpy, double x, double y, bool relative=false);
-        Path& bezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y,  double x, double y, bool relative=false);
+        Path& quadraticCurveTo(double x, double y, bool relative=false);
+        Path& cubicCurveTo(double cp1x, double cp1y, double cp2x, double cp2y,  double x, double y, bool relative=false);
+        Path& cubicCurveTo(double cp2x, double cp2y,  double x, double y, bool relative=false);
         Path& arcTo(double rx, double ry, double x_axis_rotation, double large_arc_flag, double sweep_flag, double x, double y, bool relative=false);
     };
 
