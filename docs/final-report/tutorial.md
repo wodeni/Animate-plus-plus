@@ -4,13 +4,10 @@ __Wode "Nimo" Ni - wn2155@columbia.edu__
 __Xuanyuan Zhang - xz2580@columbia.edu__
 
 ## Installation
-### 1. Download required libraries
+### Download required libraries
 - [boost](https://www.boost.org/) is utilized in our project. To download boost, simply run
 	brew install boost on MacOS or download boost from the [given URL](https://www.boost.org/users/history/version_1_66_0.html) if you are Windows or Linux user.
 - [pugi](https://pugixml.org/) is the xml parser which supports all parsing tasks, helping us extract content from SVG files. Tutorial on downloading pugi can be followed through [this link](https://pugixml.org/). After library being downloaded, put the whole unzipped file under the same directory as the code files, and you are ready to go.
-
-### 2. Compile and run with your own code
-TODO. We have not decided whether we want a library or just let users to include our files.
 
 ## Basic shapes
 ### 1. Rectangle
@@ -98,19 +95,37 @@ TODO. We have not decided whether we want a library or just let users to include
 	Path p(d);
 	```
 
-## Set external properties TODO
-Other than basic properties of each shape, there are more external properties, including color, stroke, etc. Animate++ supports easy ways for users to add, modify, fetch and remove properties.
+## Set external properties
+Other than basic properties of each shape, there are more external properties, including color, stroke, etc. Animate++ supports easy ways for users to add properties.
 The general way to set attribute is:
 ```cpp
 r.attr(string name, string value);
 ```
-Given an example in below:
+Given an example in below.
+Before we set up stroke, fill and stroke-width:
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<rect x="20" y="20" rx="3" ry="3" width="30" height="30">
+	</rect>
+</svg>
+
 `<rect x="10" y="10" width="30" height="30" stroke="black" fill="transparent" stroke-width="5"/>`
 This is a rectangle with three external properties, stroke, fill and stroke-width.
 ```cpp
-r.attr();
+r.attr({
+		{"stroke", "black"},
+		{"fill", "transparent"},
+		{"stroke-width", "5"},
+});
 ```
-## Complex shapes TODO
+After setting up attributes, that's how it looks like.
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<rect x="20" y="20" rx="3" ry="3" width="30" height="30" fill="red" stroke="black" stroke-width="5">
+	</rect>
+</svg>
+
+## Complex shapes
 Of course, supporting only single type of object is not sufficient to accomplish all fancy functionalities that can potentially be achieved by SVGs. Animate++ also supports multiple shapes contained in one single file to be loaded all together.
 ```cpp
 // load in svg from a path, which is a string of local file directory
@@ -134,5 +149,69 @@ g -> save(out_path);
 ```
 
 ## Animation
+In SVGs, objects can have animations, which are defined in the tag `<animateTransform>`.
+Animate++ also supports animation editing. Each shape object has an <span style="color:purple">animator</span> named <span style="color:blue">animate</span>. When user wants to edit the animation, simply call the [object_name].animate.[function] to set up the animation. Here are examples in detail.
+### Translation
+In translation, user needs to define the initial and ending position on x and y axis. An example of translation is shown in below, from "100 100" to "0 200" entails that the object transforms from (100, 100) to (0, 200).
+`<animateTransform attributeName="transform" type="translate" dur="2.5s" from="100 100" repeatCount="indefinite" to="0 200" />`
+And that's how we use animate++ to rewrite the translation.
+```cpp
+c.animate.translate(Point(100, 100), Point(0, 200))
+	 .duration("2.5s")
+	 .loop(true);
+```
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width=300 height=400>
+	<circle cx="100" cy="100" r="100" fill="yellow" opacity="0.5">
+		<animateTransform attributeName="transform" type="translate" dur="2.5s" from="100 100" repeatCount="indefinite" to="0 200" />
+	</circle>
+</svg>
 
-## Examples
+Or instead, given the amount an object is translated from current position instead of its destination using keyword <span style="color:red">by</span>, which we referred to as relative translation. An example is shown in below.
+`<animateTransform attributeName="transform" type="translate" by="0 200" dur="2.5s" from="100 100" repeatCount="indefinite" />`
+This is also simple to achieve in animate++, for we only give a true boolean value as the third argument taken by translate function, which is by default false.
+```cpp
+c.animate.translate(Point(100, 100), Point(0, 200), true)
+	 .duration("2.5s")
+	 .loop(true);
+```
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width=400 height=600>
+	<circle cx="100" cy="100" r="100" fill="yellow" opacity="0.5">
+		<animateTransform attributeName="transform" type="translate" dur="2.5s" from="100 100" repeatCount="indefinite" by="0 200" />
+	</circle>
+</svg>
+
+### Rotation
+In rotation, the from and to are in the form "n1 n2 n3", where "n1" entails the degree of rotation, and (n2, n3) indicates the center position of rotation. An example shown in below.
+`		<animateTransform attributeName="transform" type="rotate" dur="10s" from="0 100 100" repeatCount="indefinite" to="360 100 100" />
+`
+That's how animate++ implements such rotation.
+```cpp
+Point center(100, 100);
+r.animate.rotate(center, 0, center, 360)
+	 .duration("10s")
+	 .loop(true);
+```
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width=250 height=200>
+	<rect x="20" y="20" rx="3" ry="3" width="100" height="100" fill="red" stroke="black" stroke-width="5">
+		<animateTransform attributeName="transform" type="rotate" dur="10s" from="0 100 100" repeatCount="indefinite" to="360 100 100" />
+	</rect>
+</svg>
+
+### Scaling
+In scaling, the initial and ending scaling on x and y axis are both required. An example of scaling animation in SVG is shown in below, from "0 0" to "1 1" entails that the object's scale transforms from (0*x, 0*y) to (1*x, 1*y).
+`		<animateTransform attributeName="transform" type="scale" dur="2.5s" from="0 0" repeatCount="indefinite" to="1 1" />`
+And that's how we use animate++ to rewrite the scaling.
+```cpp
+c.animate.scale(Point(0, 0), Point(1, 1)) // from="0 0" to="1 1"
+	 .duration("2.5s") // dur="2.5s"
+	 .loop(true); // repeatCount="indefinite"
+```
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<circle cx="100" cy="100" r="100" fill="aqua" opacity="0.5">
+		<animateTransform attributeName="transform" type="scale" dur="2.5s" from="0 0" repeatCount="indefinite" to="1 1" />
+	</circle>
+</svg>
