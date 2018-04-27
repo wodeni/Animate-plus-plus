@@ -1,55 +1,7 @@
 # Animate++: Complete Reference Manual
 
-## 0. Table of Contents
-
-<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
-
-- [Animate++: Complete Reference Manual](#animate-complete-reference-manual)
-	- [0. Table of Contents](#0-table-of-contents)
-	- [1. Overall](#1-overall)
-	- [2. Background](#2-background)
-	- [3. ChangeLog](#3-changelog)
-	- [4. API Reference](#4-api-reference)
-	- [Classes](#classes)
-		- [Point](#point)
-			- [print()](#print)
-		- [Shape](#shape)
-			- [1. Rectangle](#1-rectangle)
-			- [2. Circle](#2-circle)
-			- [3. Ellipse](#3-ellipse)
-			- [4. Line](#4-line)
-			- [5. Polyline](#5-polyline)
-			- [6. Polygon](#6-polygon)
-			- [7. Path](#7-path)
-				- [moveTo()](#moveto)
-				- [lineTo()](#lineto)
-				- [quadraticCurveTo()](#quadraticcurveto)
-				- [arcTo()](#arcto)
-				- [cubicCurveTo()](#cubiccurveto)
-		- [More functions for objects with any shape.](#more-functions-for-objects-with-any-shape)
-			- [print()](#print)
-			- [export_SVG()](#exportsvg)
-			- [attr()](#attr)
-			- [get_attributes()](#getattributes)
-			- [print_attributes()](#printattributes)
-			- [export_attributes()](#exportattributes)
-			- [add_animations()](#addanimations)
-			- [save()](#save)
-		- [Complex shapes (How compound object has each component edited individually?)](#complex-shapes-how-compound-object-has-each-component-edited-individually)
-		- [Animator](#animator)
-			- [translate()](#translate)
-			- [rotate()](#rotate)
-			- [scale()](#scale)
-			- [move_along()](#movealong)
-			- [active()](#active)
-			- [duration()](#duration)
-			- [loop()](#loop)
-
-<!-- /TOC -->
-
 ## 1. Overall
 Animate++ is a light-weighted SVG processing library used in C++, which is in pursuit of standardized SVG formatting utilizing C++ features as well as easy-to-call API.
-
 The functionalities of Animate++ are listed in below:
 1. Loading and exporting SVG files.
 2. Creating all fundamental shapes.
@@ -59,15 +11,11 @@ The functionalities of Animate++ are listed in below:
 
 ## 2. Background
 
-- SVG
-    - SVG stands for Scalable Vector Graphics.
-    - Most used SVG libraries are all written in JS due to its tight relationship with front-end.
-    - From our point of view, Object Oriented Design can largely improve the scalability and performance of a SVG library. Together with type checking and other C++ features, we find C++ a good match up for SVG manipulation and animation.
-- SMIL
-    - SMIL stands for XML based SVG files, the major strength of which is to store complicated SVG files together with animations. Nowadays, SMIL has been largely replaced by CSS based SVG files.
-    - What charming about SMIL is its standalone feature, which is saying the whole SVG together with animation are all contained within the same file. This is not the case with CSS and Javascript, as CSS usually contains static components while Javascript is in charge of animations. Because of that, many digital artists are in favor of SMIL, and we want to save the standards of SVGs from the rampant SVG community.
+TODO
 
-With C++ and SMIL, we are about to make a change.
+- SVG
+    - `<canvas>`
+- SMIL
 
 ## 3. ChangeLog
 
@@ -95,19 +43,13 @@ With C++ and SMIL, we are about to make a change.
   <?xml version="1.0"?>
   <svg version="1.1" xmlns="http://www.w3.org/2000/svg">
     <g>
-      <rect x="10" y="10" rx="0" ry="0" width="30" height="30"
-           fill="transparent" stroke="black" stroke-width="5" />
-      <rect x="60" y="10" rx="10" ry="10" width="30" height="30"
-           fill="transparent" stroke="black" stroke-width="5" />
-      <circle cx="25" cy="75" r="20" fill="transparent" stroke="red"
-           stroke-width="5" />
-      <ellipse cx="75" cy="75" rx="20" ry="5" fill="transparent"
-           stroke="red" stroke-width="5" />
+      <rect x="10" y="10" rx="0" ry="0" width="30" height="30" fill="transparent" stroke="black" stroke-width="5" />
+      <rect x="60" y="10" rx="10" ry="10" width="30" height="30" fill="transparent" stroke="black" stroke-width="5" />
+      <circle cx="25" cy="75" r="20" fill="transparent" stroke="red" stroke-width="5" />
+      <ellipse cx="75" cy="75" rx="20" ry="5" fill="transparent" stroke="red" stroke-width="5" />
       <line x1="10" y1="110" x2="50" y2="150" stroke="orange" stroke-width="5" />
-      <polyline points="60 110 65 120 70 115 75 130 80 125 85 140 90 135 95
-           150 100 145" fill="transparent" stroke="orange" stroke-width="5" />
-      <polygon points="50 160 55 180 70 180 60 190 65 205 50 195 35 205 40
-           190 30 180 45 180" fill="transparent" stroke="green" stroke-width="5" />
+      <polyline points="60 110 65 120 70 115 75 130 80 125 85 140 90 135 95 150 100 145" fill="transparent" stroke="orange" stroke-width="5" />
+      <polygon points="50 160 55 180 70 180 60 190 65 205 50 195 35 205 40 190 30 180 45 180" fill="transparent" stroke="green" stroke-width="5" />
       <path d="M 20 230 Q 40 205 50 230 T 90 230 " fill="none" stroke="blue" stroke-width="5" />
     </g>
   </svg>
@@ -128,12 +70,9 @@ With C++ and SMIL, we are about to make a change.
   The SVG after editing
   ```xml
   <circle cx="100" cy="100" r="100" fill="yellow" opacity="0.5">
-      <animateTransform attributeName="transform"
-           type="translate" dur="2.5s" from="100 100"
-           repeatCount="indefinite" to="0 200" />
+      <animateTransform attributeName="transform" type="translate" dur="2.5s" from="100 100" repeatCount="indefinite" to="0 200" />
   </circle>
   ```
-
 - `1.0`
   - Fonts, fills and strokes are all completed(shown in the code snippet in below)
   ```cpp
@@ -146,10 +85,7 @@ With C++ and SMIL, we are about to make a change.
   - Gradients and patterns are special entities in SVG standards, which require building and referring to xml references. We have utilized it in our logo, but up to now there is no general support for these features.
   - Complicated animation has also been accomplished. In the example given below, we load a tiger SVG as a combination of more than 200 beizer curves with over 700 lines of code. The whole tiger head can rotate and translate.
 
-  <p align="center">
-      <img src="../assets/final-report/tiger.png" style="width:50%">
-  </p>
-
+  ![tiger](../assets/final-report/tiger.png)
   - Path class completed. Can now modify all different kinds of paths including line, quadratic curve, bezier curve and arc.
 - `1.2`
   - Motions along all different types of paths are available.
@@ -320,7 +256,10 @@ p.cubicCurveTo(cp1x, cp1y, cp2x, cp2y, x, y, relative);
    .arcTo(120, 120, -45, 0, 1, 110, 10)
    .arcTo(120, 120, -45, 0, 1, 10,  110);
   ```
-![](../assets/final-report/cubic_curve.png)
+  <?xml version="1.0"?>
+  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  	<path d="M 10 110 A 120 120 -45 0 1 110 10 A 120 120 -45 0 1 10 110 " id="path_0" />
+  </svg>
 
 ### More functions for objects with any shape.
 
@@ -487,7 +426,19 @@ ball.animate.move_along(p)
 Group g(p, end_point1, end_point2, ball);
 g.save(out_path);
 ```
-![](../assets/final-report/bezier.png)
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<g id="group_1805">
+		<path d="M 10 110 A 120 120 -45 0 1 110 10 A 120 120 -45 0 1 10 110 " fill="none" stroke="lightgrey" stroke-width="2" id="path_1801" />
+		<circle cx="10" cy="110" r="3" fill="lightgrey" id="circle_1802" />
+		<circle cx="110" cy="10" r="3" fill="lightgrey" id="circle_1803" />
+		<circle cx="0" cy="0" r="5" fill="red" id="circle_1804">
+			<animateMotion dur="6s" repeatCount="indefinite">
+				<mpath xlink:href="#path_1801" />
+			</animateMotion>
+		</circle>
+	</g>
+</svg>
 
 #### active()
 Check whether given object has any animation with it.
@@ -496,7 +447,7 @@ c.animate.active() // return true if c contains any animation.
 ```
 
 #### duration()
-Return void
+<span style="color:red"> return </span> void
 Set the duration for the animation.
 ```cpp
 c.animate.duration("2.5s"); // set animation duration to 2.5 seconds.
