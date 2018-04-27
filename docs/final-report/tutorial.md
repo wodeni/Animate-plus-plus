@@ -4,13 +4,56 @@ __Wode "Nimo" Ni - wn2155@columbia.edu__
 __Xuanyuan Zhang - xz2580@columbia.edu__
 
 ## Installation
-### Download required libraries
-- [boost](https://www.boost.org/) is utilized in our project. To download boost, simply run
-	brew install boost on MacOS or download boost from the [given URL](https://www.boost.org/users/history/version_1_66_0.html) if you are Windows or Linux user.
-- [pugi](https://pugixml.org/) is the xml parser which supports all parsing tasks, helping us extract content from SVG files. Tutorial on downloading pugi can be followed through [this link](https://pugixml.org/). After library being downloaded, put the whole unzipped file under the same directory as the code files, and you are ready to go.
 
-## Basic shapes
+## Dependencies
+
+- C++17
+- clang: macOS version
+```
+clang version 6.0.0 (tags/RELEASE_600/final)
+```
+- ar: UNIX command line tool
+- [boost](https://www.boost.org/) is utilized in our project. To download boost, simply run `brew install boost` on MacOS or download boost from the [this link](https://www.boost.org/users/history/version_1_66_0.html) if you are a Windows or Linux user.
+	- Tested version: `1.66.0`
+- [pugi](https://pugixml.org/) is the xml parser which supports all parsing tasks, helping us extract content from SVG files. Tutorial on downloading pugi can be followed through [this link](https://pugixml.org/). After library being downloaded, put the whole unzipped file under the same directory as the code files, and you are ready to go.
+	- Tested version: `1.9`
+
+## Getting started
+
+- To build the project: type `make`
+    - compiles the library and archives it using `ar`
+    - generates `libAnipp.a` in `build` directory
+- To build tests: type `make test`
+    - generates a binary called `test-driver` in `build` directory
+    - run `./build/test-driver` to run all the tests
+    - all outputs of the tests are contained in `test/output`
+- To build an `tar` file that contains all headers and the library archive to use Animate++ elsewhere, type `make release`, which generates a tar file in same directory.
+    - To use the library, you need to have `boost` on your machine
+    - To compile a test file that calls functions from Animate++, suppose we have a test file `main.cpp`
+
+    ```cpp
+    #include "animate.hpp"
+    #include <iostream>
+    int main() {
+        anipp::Circle c(10, 10,1);
+        std::cout << c << '\n';
+    }
+    ```
+
+    - You can write a Makefile or just use the following commands to compile  `main.cpp` (assuming `boost` is located at `/usr/local/Cellar/boost/1.66.0/`).
+    ```shell
+    $ g++ -c main.cpp -o main.o  -I./src -I./include/pugixml-1.9/src
+	-I/usr/local/Cellar/boost/1.66.0/include  -std=c++1z
+
+    $ g++ main.o -o main -I./src  -I/usr/local/Cellar/boost/1.66.0/include
+	-L/usr/local/Cellar/boost/1.66.0/lib -lboost_regex-mt -L. -lAnipp
+    ```
+    - If you have a newer version of Clang, please use `std=c++17` instead of `std=c++1z`.
+
+## Creating Basic shapes
+
 ### 1. Rectangle
+
 - In SVG, rectangle is called using `<rect>`.
 	Within the scope of `<rect>`, we need to define <span style="color:red"> 4 </span> major properties to at least make the shape valid: <span style="color:blue">
 	x : x-coordinate of top left corner
@@ -25,6 +68,7 @@ __Xuanyuan Zhang - xz2580@columbia.edu__
 	Rect r(10, 10, 30, 30);
 	```
 ### 2. Circle
+
 - In SVG, rectangle is called using `<circle>`.
 	Within the scope of `<rect>`, we need to define <span style="color:red"> 3 </span> major properties to at least make the shape valid: <span style="color:blue">
 	cx : center coordinate on x-axis
@@ -86,15 +130,16 @@ __Xuanyuan Zhang - xz2580@columbia.edu__
 	```
 ### 7. Path
 - In SVG, path is called using `<path>`.
-	Path, which essentially is a bezier curve, is the most complicated shape among all SVG basic shapes, but it is what makes SVG charming. There can be a large number of types of input bezier curve and they end up to be all valid. Due to the large number of samples covered, we will not enumerate all of them in the following. Our parser has covered most of the valid bezier curves. Any valid form of bezier curve can be taken as a string input to our constructor.
+	Path is the fundamental building block to compose complicated shape among all SVG basic shapes, but it is what makes SVG powerful. There can be a large number of types of input paths and they end up to be all valid. Due to the large number of samples covered, we will not enumerate all of them in the following text (see our complete documentation for details). Our parser has covered most of the valid curve commands. Any valid curve command can be taken as a string input to our constructor.
 - An example shown in below as:
 	`<path d="M20,230 Q40,205 50,230 T90,230"/>`
-	Our c++ initialization is:
+	Our c++ initialization can be:
 	```cpp
 	string d="M20,230 Q40,205 50,230 T90,230";
 	Path p(d);
 	```
-- There are some more useful functions to edit our path.
+- There are some more useful functions that can be used to build a `Path` object.
+
 ##### moveTo()
 - move the path to a certain position without drawing.
 - Taking three parameters in sequence.
@@ -169,9 +214,9 @@ Before we set up stroke, fill and stroke-width:
 This is a rectangle with three external properties, stroke, fill and stroke-width.
 ```cpp
 r.attr({
-		{"stroke", "black"},
-		{"fill", "red"},
-		{"stroke-width", "5"},
+	{"stroke", "black"},
+	{"fill", "red"},
+	{"stroke-width", "5"},
 });
 ```
 After setting up attributes, that's how it looks like.
@@ -179,8 +224,8 @@ After setting up attributes, that's how it looks like.
 We can simply modify the attributes to overwrite existing ones. For example:
 ```cpp
 r.attr({
-		{"stroke", "black"},
-		{"fill", "red"}
+	{"stroke", "black"},
+	{"fill", "red"}
 });
 // now we reset fill color to yellow.
 r.attr("fill", "yellow");
@@ -189,6 +234,7 @@ r.attr("stroke", "");
 ```
 ## Complex shapes
 Of course, supporting only single type of object is not sufficient to accomplish all fancy functionalities that can potentially be achieved by SVGs. Animate++ also supports multiple shapes contained in one single file to be loaded all together.
+
 ```cpp
 // load in svg from a path, which is a string of local file directory
 ShapePtr g = load(in_path);
@@ -199,6 +245,7 @@ g->save(out_path);
 ## Input and Output
 
 ### Load directly from external SVGs
+
 Other than creating users' own objects, one can simply load the object given relative path of the svg file, creating a <span style="color:purple">ShapePtr</span> object, which is simply a pointer to a Shape object.
 ```cpp
 string in_path = "sample.svg";
@@ -211,32 +258,49 @@ g -> save(out_path);
 ```
 
 ## Animation
-In SVGs, objects can have animations, which are defined in the tag `<animateTransform>`.
-Animate++ also supports animation editing. Each shape object has an <span style="color:purple">animator</span> named <span style="color:blue">animate</span>. When user wants to edit the animation, simply call the [object_name].animate.[function] to set up the animation. Here are examples in detail.
+
+In SVGs, objects can be animated, which are defined in tags such as `<animateTransform>` and, more generally, `<animate>`.
+Animate++ also supports animation editing. Each shape object has an <span style="color:purple">animator</span> named <span style="color:blue">animate</span>. When user wants to edit the animation, simply call the `[object_name].animate.[function]` to set up the animation. Here are examples in detail.
+
 ### Translation
+
 In translation, user needs to define the initial and ending position on x and y axis. An example of translation is shown in below, from "100 100" to "0 200" entails that the object transforms from (100, 100) to (0, 200).
+
 `<animateTransform attributeName="transform" type="translate" dur="2.5s" from="100 100" repeatCount="indefinite" to="0 200" />`
+
 And that's how we use animate++ to rewrite the translation.
+
 ```cpp
 c.animate.translate(Point(100, 100), Point(0, 200))
 	 .duration("2.5s")
 	 .loop(true);
 ```
+
 ![](../assets/final-report/sphere_translation_abs.png)
 
 Or instead, given the amount an object is translated from current position instead of its destination using keyword <span style="color:red">by</span>, which we referred to as relative translation. An example is shown in below.
+
 `<animateTransform attributeName="transform" type="translate" by="0 200" dur="2.5s" from="100 100" repeatCount="indefinite" />`
+
 This is also simple to achieve in animate++, for we only give a true boolean value as the third argument taken by translate function, which is by default false.
+
 ```cpp
 c.animate.translate(Point(100, 100), Point(0, 200), true)
 	 .duration("2.5s")
 	 .loop(true);
 ```
+
 ![](../assets/final-report/sphere_translation_rel.png)
+
 ### Rotation
+
 In rotation, the from and to are in the form "n1 n2 n3", where "n1" entails the degree of rotation, and (n2, n3) indicates the center position of rotation. An example shown in below.
-`		<animateTransform attributeName="transform" type="rotate" dur="10s" from="0 100 100" repeatCount="indefinite" to="360 100 100" />
-`
+```xml
+<animateTransform attributeName="transform"
+	type="rotate" dur="10s" from="0 100 100"
+	repeatCount="indefinite" to="360 100 100" />
+```
+
 That's how animate++ implements such rotation.
 ```cpp
 Point center(100, 100);
@@ -245,10 +309,18 @@ r.animate.rotate(center, 0, center, 360)
 	 .loop(true);
 ```
 ![](../assets/final-report/square_rotation.png)
+
 ### Scaling
+
 In scaling, the initial and ending scaling on x and y axis are both required. An example of scaling animation in SVG is shown in below, from "0 0" to "1 1" entails that the object's scale transforms from (0*x, 0*y) to (1*x, 1*y).
-`		<animateTransform attributeName="transform" type="scale" dur="2.5s" from="0 0" repeatCount="indefinite" to="1 1" />`
+```xml
+<animateTransform attributeName="transform"
+	type="scale" dur="2.5s" from="0 0"
+	repeatCount="indefinite" to="1 1" />
+```
+
 And that's how we use animate++ to rewrite the scaling.
+
 ```cpp
 c.animate.scale(Point(0, 0), Point(1, 1)) // from="0 0" to="1 1"
 	 .duration("2.5s") // dur="2.5s"
@@ -260,10 +332,11 @@ In move_along, user asks the animate object of any shape to take an input from a
 
 SVG file that generated from our c++ code.
 
-`<?xml version="1.0"?>
+```xml
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="group_1805">
-	<path d="M 10 110 A 120 120 -45 0 1 110 10 A 120 120 -45 0 1 10 110 " fill="none" stroke="lightgrey" stroke-width="2" id="path_1801" />
+	<path d="M 10 110 A 120 120 -45 0 1 110 10 A 120
+		120 -45 0 1 10 110 " fill="none" stroke="lightgrey" stroke-width="2" id="path_1801" />
 	<circle cx="10" cy="110" r="3" fill="lightgrey" id="circle_1802" />
 	<circle cx="110" cy="10" r="3" fill="lightgrey" id="circle_1803" />
 	<circle cx="0" cy="0" r="5" fill="red" id="circle_1804">
@@ -272,9 +345,10 @@ SVG file that generated from our c++ code.
 		</animateMotion>
 	</circle>
 </g>
-</svg>`
+</svg>
+```
 
-Our cpp code that generates the SVG above.
+Here is our C++ program that generates the SVG above:
 
 ```cpp
 // Define path that we will travel.
@@ -305,4 +379,5 @@ g.save(out_path);
 ```
 
 Here comes the result.
+
 ![](../assets/final-report/bezier.png)

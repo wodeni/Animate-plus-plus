@@ -1,8 +1,11 @@
 # Animate++ Project Status Document
 
+__Wode "Nimo" Ni - wn2155@columbia.edu__
+__Xuanyuan Zhang - xz2580@columbia.edu__
+
 ## Goals
 
-### 0.8 Version
+### `0.8` Version
 - A simple SVG loader and exporter
     - Testing criteria: the system can load an SVG into our own data structure, and then exported as another SVG file that is restored to have the same effect as the initial SVG.
     - Challenges: Interfacing with the parser/generator library, design of the Shape classes
@@ -10,7 +13,7 @@
     - Testing criteria: Generate an SVG file with valid syntax and animated output
     - Challenges: there are many ways to animate SVG files. For example, we could  either embed <animate> tags, or generate a separate CSS file that binds elements in the SVG canvas and apply transformations on them.
 
-### 1.0 Version
+### `1.0` Version
 - More detailed Styling of objects: gradients, fonts, patterns, strokes and fills
 - Support for higher-level composition of SVG animation. For example, provide grouping of geometries and animating objects as a group
 - Complex animations: object traveling along Bezier curves  
@@ -22,7 +25,7 @@
 
 ## Progress
 
-### 0.8 Version all clear
+### `0.8` Version: all clear
 - XML parsing under the support of pugi library
 - SVG loader supports all common shapes individually including
     - Rectangle
@@ -78,7 +81,8 @@ The SVG after editing
 </circle>
 ```
 
-#### 1.0 Version All clear
+### `1.0` Version: all clear
+
 - Fonts, fills and strokes are all completed(shown in the code snippet in below)
 ```cpp
 Circle c(100, 100, 100);
@@ -90,8 +94,13 @@ c.attr({
 - Gradients and patterns are special entities in SVG standards, which require building and referring to xml references. We have utilized it in our logo, but up to now there is no general support for these features.
 - Complicated animation has also been accomplished. In the example given below, we load a tiger SVG as a combination of more than 200 beizer curves with over 700 lines of code. The whole tiger head can rotate and translate.
 
-![tiger](../assets/final-report/tiger.png)
+<p align="center">
+    <img src="../assets/final-report/tiger.png" width=50%>
+</p>
+
 - Path class completed. Can now modify all different kinds of paths including line, quadratic curve, bezier curve and arc.
 
 #### 1.2 Version Something done.
-- Motions along all different types of paths are available.
+
+- Motions along all arbitrary paths are achieved. Also, any object, simple as `Circle` or complex as large `Group`s, can all be animated in the same manner
+- We attempted generating `<canvas>` code. However, there seemed not be be any accessible JavaScript generation library written in C++, which is quite the contrary from the SVG case. Therefore, maintaining syntactical correctness is significantly more challenging than SVG. Therefore, we did not release our attempt.

@@ -1,5 +1,8 @@
 # Animate++: Complete Reference Manual
 
+__Wode "Nimo" Ni - wn2155@columbia.edu__
+__Xuanyuan Zhang - xz2580@columbia.edu__
+
 ## 0. Table of Contents
 
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
@@ -506,3 +509,90 @@ Provide a boolean value determine the state of animation.
 ```cpp
 c.animate.loop(true); // c will keep on animating.
 ```
+<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Animate++: Complete Reference Manual](#animate-complete-reference-manual)
+	- [0. Table of Contents](#0-table-of-contents)
+	- [1. Overall](#1-overall)
+	- [2. Background](#2-background)
+	- [3. ChangeLog](#3-changelog)
+	- [4. API Reference](#4-api-reference)
+	- [Classes](#classes)
+		- [Point](#point)
+			- [print()](#print)
+		- [Shape](#shape)
+			- [1. Rectangle](#1-rectangle)
+			- [2. Circle](#2-circle)
+			- [3. Ellipse](#3-ellipse)
+			- [4. Line](#4-line)
+			- [5. Polyline](#5-polyline)
+			- [6. Polygon](#6-polygon)
+			- [7. Path](#7-path)
+				- [moveTo()](#moveto)
+				- [lineTo()](#lineto)
+				- [quadraticCurveTo()](#quadraticcurveto)
+				- [arcTo()](#arcto)
+				- [cubicCurveTo()](#cubiccurveto)
+		- [More functions for objects with any shape.](#more-functions-for-objects-with-any-shape)
+			- [print()](#print)
+			- [export_SVG()](#exportsvg)
+			- [attr()](#attr)
+			- [get_attributes()](#getattributes)
+			- [print_attributes()](#printattributes)
+			- [export_attributes()](#exportattributes)
+			- [add_animations()](#addanimations)
+			- [save()](#save)
+		- [Complex shapes (How compound object has each component edited individually?)](#complex-shapes-how-compound-object-has-each-component-edited-individually)
+		- [Animator](#animator)
+			- [translate()](#translate)
+			- [rotate()](#rotate)
+			- [scale()](#scale)
+			- [move_along()](#movealong)
+			- [active()](#active)
+			- [duration()](#duration)
+			- [loop()](#loop)
+
+<!-- /TOC --><!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Animate++: Complete Reference Manual](#animate-complete-reference-manual)
+	- [0. Table of Contents](#0-table-of-contents)
+	- [1. Overall](#1-overall)
+	- [2. Background](#2-background)
+	- [3. ChangeLog](#3-changelog)
+	- [4. API Reference](#4-api-reference)
+	- [Classes](#classes)
+		- [Point](#point)
+			- [print()](#print)
+		- [Shape](#shape)
+			- [1. Rectangle](#1-rectangle)
+			- [2. Circle](#2-circle)
+			- [3. Ellipse](#3-ellipse)
+			- [4. Line](#4-line)
+			- [5. Polyline](#5-polyline)
+			- [6. Polygon](#6-polygon)
+			- [7. Path](#7-path)
+				- [moveTo()](#moveto)
+				- [lineTo()](#lineto)
+				- [quadraticCurveTo()](#quadraticcurveto)
+				- [arcTo()](#arcto)
+				- [cubicCurveTo()](#cubiccurveto)
+		- [More functions for objects with any shape.](#more-functions-for-objects-with-any-shape)
+			- [print()](#print)
+			- [export_SVG()](#exportsvg)
+			- [attr()](#attr)
+			- [get_attributes()](#getattributes)
+			- [print_attributes()](#printattributes)
+			- [export_attributes()](#exportattributes)
+			- [add_animations()](#addanimations)
+			- [save()](#save)
+		- [Complex shapes (How compound object has each component edited individually?)](#complex-shapes-how-compound-object-has-each-component-edited-individually)
+		- [Animator](#animator)
+			- [translate()](#translate)
+			- [rotate()](#rotate)
+			- [scale()](#scale)
+			- [move_along()](#movealong)
+			- [active()](#active)
+			- [duration()](#duration)
+			- [loop()](#loop)
+
+<!-- /TOC -->
