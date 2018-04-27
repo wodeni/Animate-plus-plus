@@ -88,3 +88,37 @@ Click to show animation:
 <p align="center">
     <img src="examples/rect_rotate.svg" width=100%/>
 </p>
+
+## Directory structure
+
+├── Makefile
+├── README.md
+├── docs
+│   ├── assets
+│   ├── final-report
+│   ├── notes
+│   ├── progress-report
+│   ├── proposal
+│   └── talk
+├── examples
+│   └── rect_rotate.svg
+├── include
+│   └── pugixml-1.9
+├── src
+│   ├── animate.hpp
+│   ├── parser.cpp
+│   ├── parser.hpp
+│   ├── shapes.cpp
+│   ├── shapes.hpp
+│   ├── utils.cpp
+│   └── utils.hpp
+└── test
+    ├── src
+    └── svgs
+
+- `docs` contains most of the past and current deliverables for the course project, which also contains the following:
+- `design.pdf`: contains the design considerations of the library   
+- `manual.pdf`: contains the complete user manual for the library, which includes an API reference as well
+- `metrics.pdf`: contains our methodology of testing the implementation and the design of our test suite
+- `status.pdf`: reports on the progress of the library implementation as a course project, and compare our progress with the proposed timeline.
+- `tutorial.pdf`: contains an accessible hand-on, illustrated, example-driven tutorial to our library. __Welcome to Animate++!__
