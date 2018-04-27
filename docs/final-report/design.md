@@ -1,4 +1,4 @@
-# Design Documentation
+# Animate++ Design Documentation
 
 __Wode "Nimo" Ni - wn2155@columbia.edu__
 __Xuanyuan Zhang - xz2580@columbia.edu__
@@ -24,21 +24,21 @@ The complete implementation of our codebase together with the ideas behind those
 Our basic class structure is shown in below:
 
 The fundamental class of our project is <span style="color:red">Shape</span>, which is an abstract class with high level properties of any shape object.
-- Shape
+- `Shape`
   - private
     - attributes: A map of external attributes stored as key-value pairs.
   - public
     - animate: An animator object, containing an array of animations.
 
-Classes inherit from Shape are:
-- Rect
-- Circle
-- Ellipse
-- Line
-- Polyline
-- Polygon
-- Path
-- Group
+Classes inherit from `Shape` are:
+- `Rect`
+- `Circle`
+- `Ellipse`
+- `Line`
+- `Polyline`
+- `Polygon`
+- `Path`
+- `Group`
 
 Each one containing essential attributes that are required to make it a valid shape object. There is table shown in below about default attributes, which are utilized by us when we parse SVG content from xml_node. (More details are presented in manual)
 ```cpp
@@ -55,16 +55,16 @@ const DefaultAttributes default_attributes ({
 ```
 
 For each animation, there are a large number of public members:
-- type
-- name
-- attribute
-- from
-- to
-- by
-- repeat
-- loop
-- duration
-- add
+- `type`
+- `name`
+- `attribute`
+- `from`
+- `to`
+- `by`
+- `repeat`
+- `loop`
+- `duration`
+- `add`
 
 With all these basic components, all kinds of animations as fancy as you can imagine performed by all different types of objects will be available.
 
@@ -79,13 +79,13 @@ Other than the essential data structure, we have a few more going on.
 
 ## Comparison between Animate++ to some existing SVG libraries
 
-### Javascript
+### JavaScript
 Most SVG libraries are written in JS, mainly because of SVG's rising importance in front-end development. Here are a few svg libraries listed implemented in JS listed below:
-- paper.js
-- snap.svg
-- d3.js
+- [paper.js](http://paperjs.org/)
+- [snap.svg](snapsvg.io)
+- [d3.js](https://d3js.org/)
 
-One of the major reason why people are in favor of javascript libraries in building SVG not only because javascript is born for front-end but because it is easy to be handed on.
+One of the major reasons why people favor JavaScript libraries when building SVG not only because javascript is born for front-end but because it is easy to be handed on.
 
 What we want to propose is that what we have designed in Animate++ are equally easy to be used as those javascript libraries. Examples are given in below:
 
@@ -147,7 +147,7 @@ Which is as simple as one line.
 
 In all, we are able to provide a unique solution taking both the language advantage of C++ over Javascript and make our product as simple as javascript code.
 
-## C++17 features used.
+## C++17 features used
 
 There is one C++17 feature we used in our code, fold expression of constructor, which is to let the constructor take any number of input parameters.
 
