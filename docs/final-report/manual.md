@@ -2,6 +2,7 @@
 
 ## 1. Overall
 Animate++ is a light-weighted SVG processing library used in C++, which is in pursuit of standardized SVG formatting utilizing C++ features as well as easy-to-call API.
+
 The functionalities of Animate++ are listed in below:
 1. Loading and exporting SVG files.
 2. Creating all fundamental shapes.
@@ -11,11 +12,15 @@ The functionalities of Animate++ are listed in below:
 
 ## 2. Background
 
-TODO
-
 - SVG
-    - `<canvas>`
+    - SVG stands for Scalable Vector Graphics.
+    - Most used SVG libraries are all written in JS due to its tight relationship with front-end.
+    - From our point of view, Object Oriented Design can largely improve the scalability and performance of a SVG library. Together with type checking and other C++ features, we find C++ a good match up for SVG manipulation and animation.
 - SMIL
+    - SMIL stands for XML based SVG files, the major strength of which is to store complicated SVG files together with animations. Nowadays, SMIL has been largely replaced by CSS based SVG files.
+    - What charming about SMIL is its standalone feature, which is saying the whole SVG together with animation are all contained within the same file. This is not the case with CSS and Javascript, as CSS usually contains static components while Javascript is in charge of animations. Because of that, many digital artists are in favor of SMIL, and we want to save the standards of SVGs from the rampant SVG community.
+
+With C++ and SMIL, we are about to make a change.
 
 ## 3. ChangeLog
 
@@ -256,10 +261,7 @@ p.cubicCurveTo(cp1x, cp1y, cp2x, cp2y, x, y, relative);
    .arcTo(120, 120, -45, 0, 1, 110, 10)
    .arcTo(120, 120, -45, 0, 1, 10,  110);
   ```
-  <?xml version="1.0"?>
-  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  	<path d="M 10 110 A 120 120 -45 0 1 110 10 A 120 120 -45 0 1 10 110 " id="path_0" />
-  </svg>
+![](../assets/final-report/cubic_curve.png)
 
 ### More functions for objects with any shape.
 
@@ -426,19 +428,7 @@ ball.animate.move_along(p)
 Group g(p, end_point1, end_point2, ball);
 g.save(out_path);
 ```
-<?xml version="1.0"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-	<g id="group_1805">
-		<path d="M 10 110 A 120 120 -45 0 1 110 10 A 120 120 -45 0 1 10 110 " fill="none" stroke="lightgrey" stroke-width="2" id="path_1801" />
-		<circle cx="10" cy="110" r="3" fill="lightgrey" id="circle_1802" />
-		<circle cx="110" cy="10" r="3" fill="lightgrey" id="circle_1803" />
-		<circle cx="0" cy="0" r="5" fill="red" id="circle_1804">
-			<animateMotion dur="6s" repeatCount="indefinite">
-				<mpath xlink:href="#path_1801" />
-			</animateMotion>
-		</circle>
-	</g>
-</svg>
+![](../assets/final-report/bezier.png)
 
 #### active()
 Check whether given object has any animation with it.
@@ -447,7 +437,7 @@ c.animate.active() // return true if c contains any animation.
 ```
 
 #### duration()
-<span style="color:red"> return </span> void
+Return void
 Set the duration for the animation.
 ```cpp
 c.animate.duration("2.5s"); // set animation duration to 2.5 seconds.

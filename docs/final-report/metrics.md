@@ -141,8 +141,6 @@ void test_motion(string out_path) {
 test_motion(OUTPUT("bezier_motion.svg"));
 ```
 ![](../assets/final-report/bezier.png)
-
-
 ## memory management
 - There are not much usage of dynamic memory allocations. A few use cases are listed in below:
   1. When we call get_shape function, we take input from an arbitrary node and try to get its shape. Here we dynamically allocates the object and using ShapePtr to point to it and return a ShapePtr as the output of the function. ShapePtr is nothing special but a shared_ptr. We made this design choice because of a lack of knowledge of the input type. Therefore, we made an abstract type pointer to store the value and by the time it is out of scope somewhere, it is automatically eliminated, causing no memory leak.

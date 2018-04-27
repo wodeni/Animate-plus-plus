@@ -6,13 +6,76 @@ __Xuanyuan Zhang - xz2580@columbia.edu__
 ## Motivation for the project
 SVG stands for Scalable Vector Graphics, which is nowadays a "must" for fancy front-end in favored by both clients and front-end developers. However, the standardization of SVG has always been a big issue. Due to a lack of type-checking and other Object Oriented Programming features supported by Javascript, which have been used for over 90% of SVG libraries and editors, the syntax of SVG is expanding in a rampant manner and somehow, out of control. What we want to achieve in Animate++ is to utilize C++ features to create an easy-to-use library for both static and animated SVG in standardized manner, which can be interpreted by all major browsers. Since animation is the part with the most complicated syntax in our project, which is our major focus, we name our project as Animated++, standing for SVG Animation using C++.
 ## Current output format
-TODO (this part is not done)
-- Why SVG SMIL
-    - debates about "SMIL is dead"
-    - Standalone document
+We are interacting SVG using XML file. The reason we made this decision is based on some background research on SVG and SMIL, standing for XML based SVG files.
+
+- SVG
+    - SVG stands for Scalable Vector Graphics.
+    - Most used SVG libraries are all written in JS due to its tight relationship with front-end.
+    - From our point of view, Object Oriented Design can largely improve the scalability and performance of a SVG library. Together with type checking and other C++ features, we find C++ a good match up for SVG manipulation and animation.
+- SMIL
+    - SMIL stands for XML based SVG files, the major strength of which is to store complicated SVG files together with animations. Nowadays, SMIL has been largely replaced by CSS based SVG files.
+    - What charming about SMIL is its standalone feature, which is saying the whole SVG together with animation are all contained within the same file. This is not the case with CSS and Javascript, as CSS usually contains static components while Javascript is in charge of animations. Because of that, many digital artists are in favor of SMIL, and we want to save the standards of SVGs from the rampant SVG community.
+
+With C++ and SMIL, we are about to make a change.
 
 ## Source Code Explanation
-TODO
+The complete implementation of our codebase together with the ideas behind those are explained in manual. This is a quick view on the data structure and some important implementations we have been utilized.
+
+Our basic class structure is shown in below:
+
+The fundamental class of our project is <span style="color:red">Shape</span>, which is an abstract class with high level properties of any shape object.
+- Shape
+  - private
+    - attributes: A map of external attributes stored as key-value pairs.
+  - public
+    - animate: An animator object, containing an array of animations.
+
+Classes inherit from Shape are:
+- Rect
+- Circle
+- Ellipse
+- Line
+- Polyline
+- Polygon
+- Path
+- Group
+
+Each one containing essential attributes that are required to make it a valid shape object. There is table shown in below about default attributes, which are utilized by us when we parse SVG content from xml_node. (More details are presented in manual)
+```cpp
+const DefaultAttributes default_attributes ({
+    {"circle", {"cx", "cy", "r"}},
+    {"rect", {"x", "y", "height", "width", "rx", "ry"}},
+    {"ellipse", {"rx", "ry", "cx", "cy"}},
+    {"line", {"x1", "y1", "x2", "y2"}},
+    {"polyline", {"points"}},
+    {"polygon", {"points"}},
+    {"path", {"d"}},
+    {"group", { }}
+});
+```
+
+For each animation, there are a large number of public members:
+- type
+- name
+- attribute
+- from
+- to
+- by
+- repeat
+- loop
+- duration
+- add
+
+With all these basic components, all kinds of animations as fancy as you can imagine performed by all different types of objects will be available.
+
+Other than the essential data structure, we have a few more going on.
+
+1. XML content parsing.
+  We are utilizing pugixml library, which is a light-weighted general xml parser library in C++. To adapt it in fulfilling our requirements, we utilized "boost/regex" to not only search for SVG tags to be parsed but analyze each different types of shape together with their attributes being loaded into our customized data structures. The detail of which can be seen in parser.cpp and parser.hpp. Comments are well-made and we will save time for readers who are not that interested in the parser here.
+
+2. Loading and exporting
+  For loading, we either parse from XML file to extract shapes, attributes and animations. Moreover, we can create our own objects by calling the constructors of each individual object.
+  For export, we support a "save" function in Shape class that can be used by all child classes of Shape, which is basically calling export_SVG for each individual child class when we output the content.
 
 ## Comparison between Animate++ to some existing SVG libraries
 
@@ -86,9 +149,31 @@ In all, we are able to provide a unique solution taking both the language advant
 
 ## C++17 features used.
 
-TODO
+There is one C++17 feature we used in our code, fold expression of constructor, which is to let the constructor take any number of input parameters.
 
-There is one C++17 feature we used in our code, which is to
+Taking advantage of this technique, the constructor of Group object can take any number of shape objects. We then pass them all into the ShapePtrList object, which is a vector of ShapePtrs. This technique has made our life much more convenient.
+
+```cpp
+class Group : public Shape {
+private:
+    ShapePtrList shapes;
+public:
+    template<typename... Args>
+    Group(Args&&... args)
+        : Shape("group_" + std::to_string(next_id()))
+    {
+        (this->shapes.push_back(args.clone()), ...);
+    }
+
+    Group(ShapePtrList&);
+    Group(ShapeList&);
+    Group(pugi::xml_node&); // import SVG
+    // void add(Shape& s, ...);
+    ShapePtr clone() const { return ShapePtr(new Group(*this)); };
+    pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
+    std::ostream& print(std::ostream& out) const;
+};
+```
 
 ## OOP design (Factory Pattern)
 

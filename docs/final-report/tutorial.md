@@ -164,12 +164,7 @@ r.attr(string name, string value);
 ```
 Given an example in below.
 Before we set up stroke, fill and stroke-width:
-<?xml version="1.0"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
-	<rect x="20" y="20" rx="3" ry="3" width="30" height="30">
-	</rect>
-</svg>
-
+![](../assets/final-report/before_attributes.png)
 `<rect x="10" y="10" width="30" height="30" stroke="black" fill="transparent" stroke-width="5"/>`
 This is a rectangle with three external properties, stroke, fill and stroke-width.
 ```cpp
@@ -180,12 +175,7 @@ r.attr({
 });
 ```
 After setting up attributes, that's how it looks like.
-<?xml version="1.0"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
-	<rect x="20" y="20" rx="3" ry="3" width="30" height="30" fill="red" stroke="black" stroke-width="5">
-	</rect>
-</svg>
-
+![](../assets/final-report/after_attributes.png)
 We can simply modify the attributes to overwrite existing ones. For example:
 ```cpp
 r.attr({
@@ -198,7 +188,6 @@ r.attr("fill", "yellow");
 r.attr("stroke", "");
 ```
 ## Complex shapes
-TODO (What else should we say about complex shape)
 Of course, supporting only single type of object is not sufficient to accomplish all fancy functionalities that can potentially be achieved by SVGs. Animate++ also supports multiple shapes contained in one single file to be loaded all together.
 ```cpp
 // load in svg from a path, which is a string of local file directory
@@ -233,12 +222,7 @@ c.animate.translate(Point(100, 100), Point(0, 200))
 	 .duration("2.5s")
 	 .loop(true);
 ```
-<?xml version="1.0"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width=300 height=400>
-	<circle cx="100" cy="100" r="100" fill="yellow" opacity="0.5">
-		<animateTransform attributeName="transform" type="translate" dur="2.5s" from="100 100" repeatCount="indefinite" to="0 200" />
-	</circle>
-</svg>
+![](../assets/final-report/sphere_translation_abs.png)
 
 Or instead, given the amount an object is translated from current position instead of its destination using keyword <span style="color:red">by</span>, which we referred to as relative translation. An example is shown in below.
 `<animateTransform attributeName="transform" type="translate" by="0 200" dur="2.5s" from="100 100" repeatCount="indefinite" />`
@@ -248,13 +232,7 @@ c.animate.translate(Point(100, 100), Point(0, 200), true)
 	 .duration("2.5s")
 	 .loop(true);
 ```
-<?xml version="1.0"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width=400 height=600>
-	<circle cx="100" cy="100" r="100" fill="yellow" opacity="0.5">
-		<animateTransform attributeName="transform" type="translate" dur="2.5s" from="100 100" repeatCount="indefinite" by="0 200" />
-	</circle>
-</svg>
-
+![](../assets/final-report/sphere_translation_rel.png)
 ### Rotation
 In rotation, the from and to are in the form "n1 n2 n3", where "n1" entails the degree of rotation, and (n2, n3) indicates the center position of rotation. An example shown in below.
 `		<animateTransform attributeName="transform" type="rotate" dur="10s" from="0 100 100" repeatCount="indefinite" to="360 100 100" />
@@ -266,13 +244,7 @@ r.animate.rotate(center, 0, center, 360)
 	 .duration("10s")
 	 .loop(true);
 ```
-<?xml version="1.0"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width=250 height=200>
-	<rect x="20" y="20" rx="3" ry="3" width="100" height="100" fill="red" stroke="black" stroke-width="5">
-		<animateTransform attributeName="transform" type="rotate" dur="10s" from="0 100 100" repeatCount="indefinite" to="360 100 100" />
-	</rect>
-</svg>
-
+![](../assets/final-report/square_rotation.png)
 ### Scaling
 In scaling, the initial and ending scaling on x and y axis are both required. An example of scaling animation in SVG is shown in below, from "0 0" to "1 1" entails that the object's scale transforms from (0*x, 0*y) to (1*x, 1*y).
 `		<animateTransform attributeName="transform" type="scale" dur="2.5s" from="0 0" repeatCount="indefinite" to="1 1" />`
@@ -282,13 +254,7 @@ c.animate.scale(Point(0, 0), Point(1, 1)) // from="0 0" to="1 1"
 	 .duration("2.5s") // dur="2.5s"
 	 .loop(true); // repeatCount="indefinite"
 ```
-<?xml version="1.0"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
-	<circle cx="100" cy="100" r="100" fill="aqua" opacity="0.5">
-		<animateTransform attributeName="transform" type="scale" dur="2.5s" from="0 0" repeatCount="indefinite" to="1 1" />
-	</circle>
-</svg>
-
+![](../assets/final-report/sphere_scaling.png)
 ### Move_along
 In move_along, user asks the animate object of any shape to take an input from a Path object. The object will then have a motion along the path being created. An example in below shows how we can generate complicated SVG file using straightforward c++ code:
 
@@ -339,17 +305,4 @@ g.save(out_path);
 ```
 
 Here comes the result.
-
-<?xml version="1.0"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="group_1805">
-	<path d="M 10 110 A 120 120 -45 0 1 110 10 A 120 120 -45 0 1 10 110 " fill="none" stroke="lightgrey" stroke-width="2" id="path_1801" />
-	<circle cx="10" cy="110" r="3" fill="lightgrey" id="circle_1802" />
-	<circle cx="110" cy="10" r="3" fill="lightgrey" id="circle_1803" />
-	<circle cx="0" cy="0" r="5" fill="red" id="circle_1804">
-		<animateMotion dur="6s" repeatCount="indefinite">
-			<mpath xlink:href="#path_1801" />
-		</animateMotion>
-	</circle>
-</g>
-</svg>
+![](../assets/final-report/bezier.png)
