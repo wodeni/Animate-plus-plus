@@ -6,6 +6,8 @@
 
 Animate++ is a C++ library that lets you rapidly compose beautiful vector graphics animation.
 
+__COMS 4995 Grading: please refer to [The directory of our project structure](#directory-structure) for information about where each deliverable is in the folder__
+
 ## Dependencies
 
 - C++17
@@ -116,9 +118,17 @@ Click to show animation:
     ├── src
     └── svgs
 
+- `src` contains all the original source code of Animate++
+- `include` contains third-party library files
+- `talks` contains the pdf and reveal.js versions of our presentation
 - `docs` contains most of the past and current deliverables for the course project, which also contains the following:
-- `design.pdf`: contains the design considerations of the library   
-- `manual.pdf`: contains the complete user manual for the library, which includes an API reference as well
-- `metrics.pdf`: contains our methodology of testing the implementation and the design of our test suite
-- `status.pdf`: reports on the progress of the library implementation as a course project, and compare our progress with the proposed timeline.
-- `tutorial.pdf`: contains an accessible hand-on, illustrated, example-driven tutorial to our library. __Welcome to Animate++!__
+    - `design.pdf`: contains the design considerations of the library   
+    - `manual.pdf`: contains the complete user manual for the library, which includes an API reference as well
+    - `metrics.pdf`: contains our methodology of testing the implementation and the design of our test suite
+    - `status.pdf`: reports on the progress of the library implementation as a course project, and compare our progress with the proposed timeline.
+    - `tutorial.pdf`: contains an accessible hand-on, illustrated, example-driven tutorial to our library. __Welcome to Animate++!__
+
+## Authors
+
+__Wode "Nimo" Ni - wn2155@columbia.edu__
+__Xuanyuan Zhang - xz2580@columbia.edu__
