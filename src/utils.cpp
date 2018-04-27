@@ -81,9 +81,6 @@ xml_node anipp::SVG_header(xml_document& doc) {
     svg.append_attribute("version").set_value("1.1");
     svg.append_attribute("xmlns").set_value("http://www.w3.org/2000/svg");
     svg.append_attribute("xmlns:xlink").set_value( "http://www.w3.org/1999/xlink");
-    // TODO: what should be the default value?
-    svg.append_attribute("width").set_value("200");
-    svg.append_attribute("height").set_value("100");
     return svg;
 }
 

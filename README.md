@@ -6,16 +6,47 @@
 
 Animate++ is a C++ library that lets you rapidly compose beautiful vector graphics animation.
 
-## Getting started
-
-- To build the project: `make`
-- To build tests: `make test`
-
 ## Dependencies
 
+- C++17
+- clang: macOS version
+```
+clang version 6.0.0 (tags/RELEASE_600/final)
+```
 - pugixml: `1.9`
+- boost: `1.66.0`
+- ar: command line tool
 
-## Examples
+## Getting started
+
+- To build the project: type `make`
+    - compiles the library and archive it using `ar`
+    - generates `libAnipp.a` in `build` directory
+- To build tests: type `make test`
+    - generates `test-driver` in `build` directory
+    - run `./build/test-driver` to run all the tests
+    - all outputs of the tests are contained in `test/output`
+- To build an `tar` file that contains all headers and the library archive to use Animate++ elsewhere, type `make release`, which generates a tar file in same directory.
+    - To use the library, you need to have `boost` on your machine
+        - For macOS, you can use `brew` to install `boost` by running `brew install boost`
+    - To compile a test file that calls functions from Animate++, suppose we have a test file `main.cpp`
+    ```cpp
+    #include "animate.hpp"
+    #include <iostream>
+    int main() {
+        anipp::Circle c(10, 10,1);
+        std::cout << c << '\n';
+    }
+    ```
+    - You can write a Makefile or just use the following commands to compile  `main.cpp` (assuming `boost` is located at `/usr/local/Cellar/boost/1.66.0/`).
+    ```shell
+    $ g++ -c main.cpp -o main.o  -I./src -I./include/pugixml-1.9/src -I/usr/local/Cellar/boost/1.66.0/include  -std=c++1z
+
+    $ g++ main.o -o main -I./src  -I/usr/local/Cellar/boost/1.66.0/include -L/usr/local/Cellar/boost/1.66.0/lib -lboost_regex-mt -L. -lAnipp
+    ```
+    - If you have a newer version of Clang, please use `std=c++17` instead of `std=c++1z`.
+
+## Hello World example
 
 __Sample program__: outputs a synoptically correct SVG file that yields to the same visual output
 ```cpp

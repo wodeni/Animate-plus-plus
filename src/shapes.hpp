@@ -85,7 +85,7 @@ namespace anipp {
         Animation& loop(bool);
         Animation& begin(std::string);
         Animation& after(std::string, double time_after=0);
-        Animation& duration(std::string); // TODO: std::chrono::duration?
+        Animation& duration(std::string);
         Animation& custom_attribute(std::string, std::string);
         Animation& add_element(std::string, Attributes);
 
@@ -109,23 +109,7 @@ namespace anipp {
         bool active();
 
         std::vector<pugi::xml_node> export_SVG(pugi::xml_document&);
-        std::string toString();
     };
-
-
-    // class Transform {
-    // private:
-    //     Matrix matrix;
-    // public:
-    //     Transform& translate(Point);
-    //     Transform& rotate(Point);
-    //     Transform& scale(Point);
-    //     Transform& matrix(double, double, double, double, double, double);
-    //     std::string toString();
-    // }
-
-    // Animation& translate(Animator& anim, Point from, Point to);
-    // Animation& rotate(Animator& anim, Point from, Point to);
 
     /*
      * Top level abstract class for all shapes
@@ -158,17 +142,15 @@ namespace anipp {
 
         /**
          * load attributes from string into map
-         * @param node TODO
-         * @param type TODO
          */
         void load_attributes(pugi::xml_node & node, std::string type) ;
         /**
          * export attributes to the given node
-         * @param node TODO
          */
         void export_attributes(pugi::xml_node & node) ;
-
-        // TODO: documentation
+        /**
+         * add an animation to a shape
+         */
         pugi::xml_node add_animations(pugi::xml_document&, pugi::xml_node);
 
         /**
@@ -186,7 +168,7 @@ namespace anipp {
          * Save the Shape as a standalone SVG file
          * @param filename the name of the output file
          */
-        void save(std::string);
+        void save(std::string filename, int width=-1, int height=-1, std::string style="");
     };
 
     /*
@@ -243,7 +225,6 @@ namespace anipp {
         Rect(double, double, double, double, double rx=0, double ry=0);
         Rect(pugi::xml_node&); // import SVG
         Rect(const Rect&); // copy constructor
-        // ~Rect() {} // TODO: destructor needed?
         ShapePtr clone() const { return ShapePtr(new Rect(*this)); };
         pugi::xml_node export_SVG(pugi::xml_document&, bool standalone=false);
         virtual std::ostream& print(std::ostream& out) const;
@@ -358,7 +339,6 @@ namespace anipp {
 }
 
 // A wrapper function that allows `cout << shape` kind of syntax
-// TODO: why do I have to predefine this function here for it to work???
 std::ostream& operator<< (std::ostream& out, const anipp::Shape& shp);
 
 #endif

@@ -26,9 +26,15 @@ xml_node anipp::Shape::add_animations(xml_document& doc, xml_node parent) {
     return parent;
 }
 
-void anipp::Shape::save(string filename) {
+void anipp::Shape::save(string filename, int width, int height, string style) {
     xml_document doc_out;
     auto svg  = SVG_header(doc_out);
+    if(width > 0)
+        svg.append_attribute("width").set_value(width);
+    if(height > 0)
+        svg.append_attribute("height").set_value(height);
+    if(style.size() != 0)
+        svg.append_attribute("style").set_value(style.c_str());
     auto node = this->export_SVG(doc_out);
     svg.append_move(node);
     doc_out.save_file(filename.c_str());
@@ -81,7 +87,6 @@ ShapePtr anipp::get_shape(pugi::xml_node node) {
         if     (name == "circle") res = new Circle(node);
         else if(name == "ellipse") res = new Ellipse(node);
         else if(name == "g") res = new Group(node);
-        else if(name == "circle") res = new Circle(node);
         else if(name == "rect") res = new Rect(node);
         else if(name == "ellipse") res = new Ellipse(node);
         else if(name == "line") res = new Line(node);
@@ -656,15 +661,6 @@ void Animator::blink(double duration) {
     animations.push_back(ani2);
 }
 
-// void Animator::loop(bool isLooping) { this->_loop = isLooping; }
-
-string Animator::toString() {
-    string res;
-    for(auto a : this->animations)
-        res += a.toString() + '\n';
-    return res;
-}
-
 vector<xml_node> Animator::export_SVG(xml_document& doc) {
     vector<xml_node> res;
     for(auto& a : this->animations) {
@@ -679,15 +675,6 @@ bool Animator::active() { return this->animations.size() != 0; }
 ///////////////
 // Animation //
 ///////////////
-
-string Animation::toString() {
-    // TODO
-    // string res = "Attribute to animate: " + this->attributeName;
-                 // "\nfrom: " + this->attributes["from"] +
-                 // "\nto: "   + this->_to;
-    // res += "\nduration: " + (this->dur ? dtos(*this->dur) : "indefinite");
-    // return res;
-}
 
 Animation& Animation::id(string t) {
     this->_id = t;

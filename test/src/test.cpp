@@ -124,11 +124,11 @@ void test_ani_rotate(string out_path) {
         {"stroke", "black"},
         {"stroke-width", "5"}
     });
-    Point center(100, 100);
+    Point center(70, 70);
     r.animate.rotate(center, 0, center, 360)
              .duration("10s")
              .loop(true);
-    r.save(out_path);
+    r.save(out_path, 150, 150);
 }
 
 void test_heart(string out_path) {
@@ -218,6 +218,7 @@ void test_blink_group(string in_path, string out_path) {
 void test_satellite(string out_path) {
     Circle globe(80, 80, 50);
     Path satellite, half_globe;
+
     satellite.moveTo(0, 70)
              .arcTo(65, 70, 0, 0, 0, 65, 0)
              .arcTo(5, 5, 0, 0, 1, 75, 0)
@@ -227,14 +228,29 @@ void test_satellite(string out_path) {
     satellite.animate.rotate(Point(0, 0), 360, Point(0, 0), 0)
                      .duration("1s")
                      .loop(true);
+    Group satellite_group(satellite);
+    satellite_group.attr("transform", "matrix(0.866, -0.5, 0.25, 0.433, 80, 80)");
+
     half_globe.moveTo(50, 0)
               .arcTo(50, 50, 0, 0, 0, -50, 0)
               .closePath();
-    // satellite.transfrom.matrix(0.866, -0.5, 0.25, 0.433, 80, 80);
-    // half_globe.transfrom.matrix(0.866, -0.5, 0.5, 0.866, 80, 80);
+    half_globe.attr("transform", "matrix(0.866, -0.5, 0.5, 0.866, 80, 80)");
+    Group g(globe, satellite_group, half_globe);
 
-    Group g(globe, half_globe, satellite);
-    g.save(out_path);
+    string style = "background-color: #FC0";
+    g.save(out_path, 160, 160, style);
+}
+
+void test_two_circles(string out_path) {
+    Circle c1(40, 40, 25);
+    Circle c2(60, 60, 25);
+    Group g(c1, c2);
+    g.attr({
+        {"fill", "none"},
+        {"stroke", "DeepPink"},
+        {"stroke-width", "5"},
+    });
+    g.save(out_path, 100, 100);
 }
 
 int main() {
@@ -253,6 +269,7 @@ int main() {
     test_path(OUTPUT("simple_path.svg"));
     test_ellipse(OUTPUT("simple_ellipse.svg"));
     test_heart(OUTPUT("heart.svg"));
+    test_two_circles(OUTPUT("two_circle.svg"));
 
     // Elementary animation tests
     test_ani_rotate(OUTPUT("rect_rotate.svg"));
