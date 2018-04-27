@@ -93,30 +93,30 @@ Click to show animation:
 
 ## Directory structure
 
-├── Makefile
-├── README.md
-├── docs
-│   ├── assets
-│   ├── final-report
-│   ├── notes
-│   ├── progress-report
-│   ├── proposal
-│   └── talk
-├── examples
-│   └── rect_rotate.svg
-├── include
-│   └── pugixml-1.9
-├── src
-│   ├── animate.hpp
-│   ├── parser.cpp
-│   ├── parser.hpp
-│   ├── shapes.cpp
-│   ├── shapes.hpp
-│   ├── utils.cpp
-│   └── utils.hpp
-└── test
-    ├── src
-    └── svgs
+├── Makefile                         <br>
+├── README.md                         <br>
+├── docs                         <br>
+│   ├── assets                         <br>
+│   ├── final-report                         <br>
+│   ├── notes                         <br>
+│   ├── progress-report                         <br>
+│   ├── proposal                         <br>
+│   └── talk                         <br>
+├── examples                         <br>
+│   └── rect_rotate.svg                         <br>
+├── include                         <br>
+│   └── pugixml-1.9                         <br>
+├── src                         <br>
+│   ├── animate.hpp                         <br>
+│   ├── parser.cpp                         <br>
+│   ├── parser.hpp                         <br>
+│   ├── shapes.cpp                         <br>
+│   ├── shapes.hpp                         <br>
+│   ├── utils.cpp                         <br>
+│   └── utils.hpp                         <br>
+└── test                         <br>
+    ├── src                         <br>
+    └── svgs                         <br>
 
 - `src` contains all the original source code of Animate++
 - `include` contains third-party library files
