@@ -6,8 +6,6 @@
 
 Animate++ is a C++ library that lets you rapidly compose beautiful vector graphics animation.
 
-__COMS 4995 Grading: please refer to [The directory of our project structure](#directory-structure) for information about where each deliverable is in the folder__
-
 ## Dependencies
 
 - C++17
